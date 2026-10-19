@@ -23,7 +23,7 @@ html { background: var(--bg); scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: transparent;
   color: var(--txt);
   font-family: var(--mono);
   font-size: 15px;

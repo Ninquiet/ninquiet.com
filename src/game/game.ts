@@ -1,4 +1,5 @@
 import { Sfx } from './audio';
+import { CityBackground } from './cityBackground';
 import { ENEMY, HEADER_SELECTOR, STAR_SIZE } from './constants';
 import { DomWorld, type Point } from './domWorld';
 import { Effects } from './effects';
@@ -21,6 +22,7 @@ interface Star {
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
+  background: HTMLCanvasElement;
   hitbox: HTMLButtonElement;
   readAccents: () => Accents;
   onPhase: (phase: Phase) => void;
@@ -37,6 +39,8 @@ export class Game {
   private readonly effects = new Effects();
   private readonly sfx = new Sfx();
   private readonly input: Input;
+  private readonly city: CityBackground;
+  private cityDrawn = false;
   private enemies: Enemy[] = [];
   private stars: Star[] = [];
   private phase: Phase = 'idle';
@@ -67,6 +71,7 @@ export class Game {
     this.ctx = ctx;
     this.accents = options.readAccents();
     this.input = new Input({ onQuit: () => this.quit(), onMute: () => this.sfx.toggleMute() });
+    this.city = new CityBackground(options.background);
   }
 
   mount(): void {
@@ -133,6 +138,8 @@ export class Game {
 
   private setPhase(phase: Phase): void {
     this.phase = phase;
+    if (phase === 'playing') this.city.show();
+    if (phase === 'returning' || phase === 'idle') this.city.hide();
     this.options.hitbox.hidden = phase !== 'idle';
     this.options.onPhase(phase);
   }
@@ -169,6 +176,7 @@ export class Game {
     const canvas = this.options.canvas;
     canvas.width = Math.round(this.width * this.dpr);
     canvas.height = Math.round(this.height * this.dpr);
+    this.city.resize(this.width, this.height, this.dpr);
     this.world.refresh();
   };
 
@@ -193,6 +201,7 @@ export class Game {
     const dt = Math.min(0.033, (now - this.last) / 1000);
     this.last = now;
     this.update(dt);
+    this.renderCity(dt);
     this.render();
     this.frame = requestAnimationFrame(this.loop);
   };
@@ -333,6 +342,13 @@ export class Game {
     desired = Math.min(Math.max(desired, 0), max);
     const next = window.scrollY + (desired - window.scrollY) * Math.min(1, dt * 7);
     if (Math.abs(next - window.scrollY) > 0.5) window.scrollTo({ top: next, behavior: 'instant' });
+  }
+
+  private renderCity(dt: number): void {
+    const active = this.city.update(dt);
+    if (!active && !this.cityDrawn) return;
+    this.city.render(window.scrollY, centerX(this.player.body) - window.scrollX);
+    this.cityDrawn = active;
   }
 
   private headerBottom(): number {

@@ -13,6 +13,7 @@ const TOUCH_BUTTONS: { action: Action; label: string; side: 'left' | 'right' }[]
 
 export default function BitDroid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const backgroundRef = useRef<HTMLCanvasElement>(null);
   const hitboxRef = useRef<HTMLButtonElement>(null);
   const gameRef = useRef<Game | null>(null);
   const [phase, setPhase] = useState<Phase>('idle');
@@ -20,11 +21,12 @@ export default function BitDroid() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    const background = backgroundRef.current;
     const hitbox = hitboxRef.current;
-    if (!canvas || !hitbox) return;
+    if (!canvas || !background || !hitbox) return;
     const coarse = window.matchMedia('(pointer: coarse)').matches;
     setTouch(coarse);
-    const game = new Game({ canvas, hitbox, readAccents, onPhase: setPhase, touch: coarse });
+    const game = new Game({ canvas, background, hitbox, readAccents, onPhase: setPhase, touch: coarse });
     gameRef.current = game;
     game.mount();
     const onPalette = () => game.setAccents(readAccents());
@@ -43,6 +45,7 @@ export default function BitDroid() {
 
   return (
     <>
+      <canvas ref={backgroundRef} className={styles.city} aria-hidden="true" />
       <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />
       <button
         ref={hitboxRef}
