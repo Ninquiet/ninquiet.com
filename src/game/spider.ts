@@ -100,6 +100,10 @@ class Leg {
     return !this.stepping && this.gripped;
   }
 
+  get reachingForGrip(): boolean {
+    return this.stepping && this.toGrip;
+  }
+
   hip(center: Vec, heading: number): Vec {
     return add(center, polar(heading + this.spec.angle, SPIDER.hipRadius));
   }
@@ -149,6 +153,8 @@ export class Spider implements Hostile {
   private stateTime = 0;
   private flash = 0;
   private placed = false;
+  private stuck = 0;
+  private hop = 0;
 
   constructor(x: number, surfaceY: number) {
     this.position = { x, y: surfaceY - 10 };
@@ -231,11 +237,27 @@ export class Spider implements Hostile {
 
   private crawl(c: HostileContext, target: Vec | null): void {
     const grip = this.grip();
-    const holding = grip >= SPIDER.minGrip;
+    const holding = grip >= SPIDER.minGrip || this.hop > 0;
+    this.hop = Math.max(0, this.hop - c.dt);
+    if (target && this.hop === 0) {
+      const far = distance(this.position, target) > 60;
+      this.stuck = far && length(this.velocity) < 30 ? this.stuck + c.dt : 0;
+      if (this.stuck > 0.6) {
+        this.stuck = 0;
+        this.hop = 0.35;
+        this.velocity = scale(normalize(sub(target, this.position)), 420 * this.speedFactor);
+        c.effects.dust(this.position.x, this.position.y + 20, 0.8);
+      }
+    }
+    if (this.hop > 0) {
+      this.position = add(this.position, scale(this.velocity, c.dt));
+      this.heading = lerpAngle(this.heading, Math.atan2(this.velocity.y, this.velocity.x), Math.min(1, c.dt * 8));
+      return;
+    }
     if (holding && target) {
       const toTarget = sub(target, this.position);
       const lunge = length(toTarget) < SPIDER.lungeRadius ? SPIDER.lungeBoost : 1;
-      const traction = 0.3 + 0.7 * (grip / this.legs.length);
+      const traction = 0.6 + 0.4 * (grip / this.legs.length);
       const desired = scale(normalize(toTarget), SPIDER.speed * this.speedFactor * traction * lunge);
       const steer = sub(desired, this.velocity);
       const maxStep = SPIDER.accel * this.speedFactor * c.dt;
@@ -245,8 +267,8 @@ export class Spider implements Hostile {
       this.velocity = { x: this.velocity.x * 0.98, y: this.velocity.y + SPIDER.fallGravity * c.dt };
     }
 
-    const overreached = this.legs.some((leg) => leg.planted && distance(leg.hip(this.position, this.heading), leg.foot) > MAX_REACH);
-    if (overreached && holding) this.velocity = scale(this.velocity, 0.55);
+    const overreached = this.legs.filter((leg) => leg.planted && distance(leg.hip(this.position, this.heading), leg.foot) > MAX_REACH).length;
+    if (overreached >= 2 && holding) this.velocity = scale(this.velocity, 0.9);
 
     this.position = add(this.position, scale(this.velocity, c.dt));
     this.position.x = clamp(this.position.x, 30, c.world.width - 30);
@@ -263,11 +285,11 @@ export class Spider implements Hostile {
       const hip = leg.hip(this.position, this.heading);
       const ideal = leg.ideal(this.position, this.heading, curl, this.velocity);
       if (!leg.stepping) {
-        const otherGroupStepping = this.legs.some((other) => other.stepping && other.spec.group !== leg.spec.group);
+        const otherGroupStepping = this.legs.some((other) => other.reachingForGrip && other.spec.group !== leg.spec.group);
         const drifted = distance(leg.foot, ideal) > (this.state === 'waking' ? 8 : SPIDER.stepThreshold);
-        const overreached = distance(hip, leg.foot) > MAX_REACH;
+        const overreached = distance(hip, leg.foot) > MAX_REACH * 0.95;
         const loose = !leg.gripped && leg.canRetry(this.time);
-        if ((drifted || overreached || loose) && (falling || !otherGroupStepping)) {
+        if ((drifted || overreached || loose) && (falling || overreached || !otherGroupStepping)) {
           const grip = findGrip(c.world, ideal, hip);
           leg.reach(grip ?? ideal, grip !== null, this.time);
         }
