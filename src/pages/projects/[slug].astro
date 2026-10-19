@@ -1,0 +1,106 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { CATEGORY_LABELS } from '../../data/categories';
+import { fileName, getProjects, permissions, type Project } from '../../lib/projects';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project, index) => ({
+    params: { slug: project.id },
+    props: { project, newer: projects[index - 1], older: projects[index + 1] },
+  }));
+}
+
+interface Props {
+  project: Project;
+  newer?: Project;
+  older?: Project;
+}
+
+const { project, newer, older } = Astro.props;
+const { title, summary, cover, tags, date, version, license, links, category, legacy } = project.data;
+const { Content } = await render(project);
+const ogImage = cover ? (await getImage({ src: cover, width: 1200, format: 'jpg' })).src : undefined;
+---
+
+<Base title={title} description={summary} image={ogImage}>
+  <article class="wrap article">
+    <p class="prompt">cat ~/projects/{fileName(project)}</p>
+    <header class="head">
+      <div class="meta d">
+        {permissions(project)}&nbsp;&nbsp;{CATEGORY_LABELS[category]}&nbsp;&nbsp;{date.getFullYear()}
+        {version && <>&nbsp;&nbsp;{version}</>}
+      </div>
+      <h1 class="title">{title}</h1>
+      <p class="summary">{summary}</p>
+      <div class="row">
+        {tags.map((tag) => <span class="tag">{tag}</span>)}
+      </div>
+      {
+        (links.length > 0 || license) && (
+          <div class="row links">
+            {links.map((link) => (
+              <a class="link" href={link.url} target={link.url.startsWith('http') ? '_blank' : undefined} rel="noopener">
+                {link.label} ↗
+              </a>
+            ))}
+            {license && <span class="d">license: {license}</span>}
+          </div>
+        )
+      }
+    </header>
+
+    {cover && (
+      <figure class="cover">
+        <Image src={cover} alt={title} widths={[720, 1120]} sizes="(max-width: 1160px) 100vw, 1120px" loading="eager" />
+      </figure>
+    )}
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {legacy && <p class="d note">// migrated from the old wordpress portfolio</p>}
+
+    <nav class="pager" aria-label="More projects">
+      {newer ? <a href={`/projects/${newer.id}/`}>← {fileName(newer)}</a> : <span />}
+      <a href="/projects/">cd ..</a>
+      {older ? <a href={`/projects/${older.id}/`}>{fileName(older)} →</a> : <span />}
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .article { padding-block: 48px 64px; }
+  .head { max-width: 760px; }
+  .meta { font-size: 12px; }
+  .title { font-family: var(--display); font-size: clamp(36px, 6vw, 60px); letter-spacing: -0.03em; margin: 8px 0 12px; }
+  .summary { font-size: 16px; margin: 0 0 16px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .links { margin-top: 16px; gap: 16px; font-size: 14px; }
+  .cover { margin: 40px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .prose { max-width: 760px; font-size: 15px; }
+  .prose :global(h2) { font-family: var(--display); font-size: 26px; margin: 40px 0 12px; }
+  .prose :global(h2)::before { content: '## '; color: var(--acc); font-family: var(--mono); font-size: 18px; }
+  .prose :global(p) { margin: 0 0 18px; }
+  .prose :global(img) { width: 100%; border: 1px solid var(--line); border-radius: 8px; margin: 8px 0; }
+  .prose :global(li::marker) { color: var(--acc); }
+  .prose :global(strong) { color: var(--acc); font-weight: 500; }
+  .prose :global(.embed) { position: relative; aspect-ratio: 16 / 9; margin: 24px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .prose :global(.embed iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .note { font-size: 12px; margin-top: 40px; }
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+  }
+  @media (max-width: 640px) {
+    .pager { flex-direction: column; align-items: flex-start; }
+  }
+</style>

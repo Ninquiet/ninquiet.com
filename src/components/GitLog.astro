@@ -1,0 +1,40 @@
+---
+import { CAREER } from '../data/profile';
+---
+
+<ol class="log" aria-label="Career history">
+  {
+    CAREER.map((commit, index) => {
+      const prev = CAREER[index - 1];
+      const opensBranch = commit.branch && !prev?.branch;
+      const closesBranch = !commit.branch && prev?.branch;
+      return (
+        <>
+          {opensBranch && <li class="graph p" aria-hidden="true">|\</li>}
+          {closesBranch && <li class="graph p" aria-hidden="true">|/</li>}
+          <li class="commit">
+            <span class="p graph">{commit.branch ? '| *' : '*'}</span>
+            <span class="k hash">{commit.hash}</span>
+            {commit.head && <span class="p">({commit.head})</span>}
+            <span>
+              <span class="type">{commit.type}:</span> {commit.message}
+            </span>
+            <span class="d when">{commit.when}</span>
+          </li>
+        </>
+      );
+    })
+  }
+</ol>
+
+<style>
+  .log { list-style: none; margin: 0; padding: 0; font-size: 14px; line-height: 2; }
+  .commit { display: flex; flex-wrap: wrap; gap: 0 10px; align-items: baseline; }
+  .graph { white-space: pre; min-width: 2.5ch; }
+  .type { color: var(--dim); }
+  .when { margin-left: auto; }
+  @media (max-width: 640px) {
+    .log { font-size: 13px; }
+    .when { margin-left: 0; width: 100%; padding-left: calc(2.5ch + 10px); line-height: 1.2; margin-bottom: 8px; }
+  }
+</style>

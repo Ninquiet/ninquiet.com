@@ -1,0 +1,73 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { CATEGORY_IDS, CATEGORY_LABELS } from '../../data/categories';
+import { getProjects } from '../../lib/projects';
+
+const projects = await getProjects();
+const counts = Object.fromEntries(CATEGORY_IDS.map((id) => [id, projects.filter((p) => p.data.category === id).length]));
+const categories = CATEGORY_IDS.filter((id) => counts[id] > 0);
+---
+
+<Base title="projects" description="Projects by Jesús Angarita: AI agents, dev tools, games, UI/UX, web, branding, motion, and art.">
+  <section class="section first">
+    <div class="wrap">
+      <p class="prompt">ls -la ~/projects <span class="d">| grep</span> <span class="k" id="current">*</span></p>
+      <h1 class="heading">~/projects <span class="d count">{projects.length} entries</span></h1>
+      <div class="filters" role="group" aria-label="Filter by category">
+        <button type="button" data-filter="all" aria-pressed="true">all <span class="d">{projects.length}</span></button>
+        {
+          categories.map((id) => (
+            <button type="button" data-filter={id} aria-pressed="false">
+              {CATEGORY_LABELS[id]} <span class="d">{counts[id]}</span>
+            </button>
+          ))
+        }
+      </div>
+      <div class="grid" id="projects">
+        {projects.map((project) => <ProjectCard project={project} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const cards = [...document.querySelectorAll<HTMLElement>('#projects [data-category]')];
+  const current = document.getElementById('current');
+
+  function apply(filter: string) {
+    buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.filter === filter)));
+    cards.forEach((card) => (card.hidden = filter !== 'all' && card.dataset.category !== filter));
+    if (current) current.textContent = filter === 'all' ? '*' : filter;
+    const url = new URL(window.location.href);
+    if (filter === 'all') url.searchParams.delete('c');
+    else url.searchParams.set('c', filter);
+    history.replaceState(null, '', url);
+  }
+
+  buttons.forEach((button) => button.addEventListener('click', () => apply(button.dataset.filter ?? 'all')));
+  const initial = new URLSearchParams(window.location.search).get('c');
+  if (initial && buttons.some((button) => button.dataset.filter === initial)) apply(initial);
+</script>
+
+<style>
+  .first { border-top: 0; }
+  .heading { font-family: var(--display); font-size: clamp(36px, 6vw, 56px); letter-spacing: -0.03em; margin: 0 0 24px; }
+  .count { font-family: var(--mono); font-size: 14px; letter-spacing: 0; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .filters button {
+    font: inherit;
+    font-size: 13px;
+    color: var(--txt);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 4px 12px;
+    cursor: pointer;
+  }
+  .filters button:hover { border-color: var(--dim); }
+  .filters button[aria-pressed='true'] { border-color: var(--acc); color: var(--acc); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+  .grid :global([hidden]) { display: none; }
+</style>

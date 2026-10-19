@@ -1,0 +1,32 @@
+.root { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.label { color: var(--dim); font-size: 12px; }
+
+.option {
+  font: inherit;
+  font-size: 12px;
+  color: var(--dim);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.option::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: 0;
+}
+
+.option[data-palette='phosphor']::before { background: #3ddc84; }
+.option[data-palette='amber']::before { background: #f5b83d; }
+.option[data-palette='synthwave']::before { background: #5ce1e6; }
+
+.option:hover { color: var(--txt); border-color: var(--dim); }
+
+.option[aria-pressed='true'] { color: var(--acc); border-color: var(--acc); }

@@ -1,0 +1,84 @@
+---
+import { Image } from 'astro:assets';
+import { CATEGORY_LABELS } from '../data/categories';
+import { fileName, permissions, type Project } from '../lib/projects';
+
+interface Props {
+  project: Project;
+  compact?: boolean;
+}
+
+const { project, compact = false } = Astro.props;
+const { title, summary, cover, tags, date, version, category } = project.data;
+const glyphs = '01<>/{}[]#*+=~'.repeat(40);
+---
+
+<a class:list={['card', { compact }]} href={`/projects/${project.id}/`} data-category={category}>
+  <div class="media">
+    {
+      cover ? (
+        <Image src={cover} alt="" widths={[360, 720]} sizes="(max-width: 700px) 100vw, 360px" loading="lazy" />
+      ) : (
+        <div class="placeholder" aria-hidden="true">
+          <span class="noise">{glyphs}</span>
+          <span class="mark">{title.slice(0, 2).toLowerCase()}</span>
+        </div>
+      )
+    }
+  </div>
+  <div class="body">
+    <div class="meta d">
+      {permissions(project)}&nbsp;&nbsp;{version ?? CATEGORY_LABELS[category]}&nbsp;&nbsp;{date.getFullYear()}
+    </div>
+    <h3 class="name"><span class="glitch">{fileName(project)}</span></h3>
+    <p class="title">{title}</p>
+    {!compact && <p class="summary d">{summary}</p>}
+    {
+      !compact && tags.length > 0 && (
+        <div class="tags">
+          {tags.slice(0, 4).map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    color: var(--txt);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: var(--acc); text-decoration: none; transform: translateY(-2px); }
+  .card:hover .glitch { animation: glitch 0.35s steps(2) 2; }
+  .media { aspect-ratio: 16 / 9; border-bottom: 1px solid var(--line); background: #0d120f; overflow: hidden; }
+  .compact .media { aspect-ratio: 16 / 10; }
+  .media :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: top; filter: saturate(0.85); transition: filter 0.3s, transform 0.4s; }
+  .card:hover .media :global(img) { filter: saturate(1); transform: scale(1.03); }
+  .placeholder { position: relative; height: 100%; display: grid; place-items: center; overflow: hidden; }
+  .noise {
+    position: absolute;
+    inset: 0;
+    font-size: 11px;
+    line-height: 1.4;
+    letter-spacing: 3px;
+    word-break: break-all;
+    color: var(--acc);
+    opacity: 0.18;
+  }
+  .mark { position: relative; font-family: var(--display); font-size: 56px; color: var(--acc); letter-spacing: -2px; }
+  .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .meta { font-size: 11px; }
+  .name { font-family: var(--mono); font-size: 15px; margin: 4px 0 0; }
+  .glitch { display: inline-block; }
+  .title { margin: 0; font-size: 13px; color: var(--dim); }
+  .summary { margin: 6px 0 0; font-size: 13px; line-height: 1.6; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 12px; }
+</style>

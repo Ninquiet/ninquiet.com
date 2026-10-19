@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Terminal from '../components/Terminal.tsx';
+import { getProjects, toTerminalEntry } from '../lib/projects';
+
+const projects = await getProjects();
+---
+
+<Base title="404" description="Page not found.">
+  <section class="wrap lost">
+    <p class="prompt">cd <span class="p">this-page</span></p>
+    <h1 class="code">404<span class="k">_</span></h1>
+    <p class="d">bash: cd: no such file or directory. maybe it was deleted, maybe it never existed.</p>
+    <div class="term">
+      <Terminal client:load projects={projects.map(toTerminalEntry)} intro="ls" />
+    </div>
+    <p><a href="/">cd ~</a></p>
+  </section>
+</Base>
+
+<style>
+  .lost { padding-block: 64px; }
+  .code { font-family: var(--display); font-size: clamp(72px, 16vw, 160px); letter-spacing: -0.05em; margin: 0; line-height: 1; }
+  .term { max-width: 680px; margin: 32px 0; }
+</style>

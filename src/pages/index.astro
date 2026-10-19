@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+import GlyphBackground from '../components/GlyphBackground.tsx';
+import Terminal from '../components/Terminal.tsx';
+import ProjectCard from '../components/ProjectCard.astro';
+import GitLog from '../components/GitLog.astro';
+import { PROFILE } from '../data/profile';
+import { HOME_SECTIONS } from '../data/homeSections';
+import { getProjects, pickForSection, toTerminalEntry } from '../lib/projects';
+
+const projects = await getProjects();
+const sections = HOME_SECTIONS.map((section) => ({ ...section, ...pickForSection(projects, section.categories, section.limit) }));
+const shownCount = sections.reduce((total, section) => total + section.shown.length, 0);
+const archiveCount = projects.length - shownCount;
+---
+
+<Base>
+  <section class="hero">
+    <GlyphBackground client:only="react" />
+    <div class="wrap hero-grid">
+      <div class="intro">
+        <p class="d hello">// hello, world</p>
+        <h1 class="name">jesús<br />angarita<span class="k">_</span></h1>
+        <p class="role"><span class="k">{PROFILE.role}</span><br />{PROFILE.focus.join(' · ')}</p>
+        <p class="d blurb">
+          {PROFILE.years} years building virtual worlds,<br />tools for agents, and the occasional<br />pixel that shouldn't exist.
+        </p>
+        <div class="chips">
+          <span class="tag">{PROFILE.location}</span>
+          <span class="tag">@ {PROFILE.company}</span>
+          <a class="tag" href={PROFILE.github}>github</a>
+          <a class="tag" href={PROFILE.linkedin}>linkedin</a>
+        </div>
+      </div>
+      <Terminal client:load projects={projects.map(toTerminalEntry)} />
+    </div>
+  </section>
+
+  {
+    sections.map((section) => (
+      <section class="section" id={section.id}>
+        <div class="wrap">
+          <p class="prompt">{section.prompt}</p>
+          <div class="grid">
+            {section.shown.map((project) => (
+              <ProjectCard project={project} />
+            ))}
+          </div>
+          {section.rest > 0 && (
+            <p class="more">
+              <a href={`/projects/?c=${section.categories[section.categories.length - 1]}`}>
+                ls --all <span class="d">// +{section.rest} more</span>
+              </a>
+            </p>
+          )}
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section archive">
+    <div class="wrap">
+      <a href="/projects/">cd ~/projects <span class="d">// {archiveCount} more in the archive: ui/ux, web, branding, motion, art</span></a>
+    </div>
+  </section>
+
+  <section class="section" id="log">
+    <div class="wrap">
+      <p class="prompt">git log --graph --oneline career</p>
+      <GitLog />
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="wrap contact">
+      <p class="prompt">./contact.sh</p>
+      <h2 class="cta">Let's build something<br />that shouldn't exist yet<span class="k">.</span></h2>
+      <a class="mail" href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
+      <div class="chips">
+        <a class="tag" href={PROFILE.github}>github.com/Ninquiet</a>
+        <a class="tag" href={PROFILE.linkedin}>linkedin.com/in/ninquiet</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { position: relative; padding-block: clamp(40px, 8vw, 88px); overflow: hidden; }
+  .hero-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: clamp(24px, 4vw, 56px);
+    align-items: center;
+  }
+  .hello { font-size: 13px; margin: 0 0 12px; }
+  .name {
+    font-family: var(--display);
+    font-size: clamp(48px, 8vw, 88px);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin: 0;
+  }
+  .role { font-size: 15px; margin: 20px 0 0; }
+  .blurb { font-size: 13px; margin: 16px 0 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  a.tag:hover { color: var(--acc); border-color: var(--acc); text-decoration: none; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+  .more { margin: 24px 0 0; font-size: 14px; }
+  .archive { padding-block: 32px; font-size: 14px; }
+  .contact { display: flex; flex-direction: column; align-items: flex-start; }
+  .cta { font-family: var(--display); font-size: clamp(32px, 5vw, 56px); letter-spacing: -0.03em; margin: 0 0 24px; }
+  .mail { font-size: clamp(16px, 2.4vw, 22px); }
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

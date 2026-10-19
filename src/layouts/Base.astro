@@ -1,0 +1,95 @@
+---
+import '../styles/global.css';
+import { PROFILE } from '../data/profile';
+import PaletteSwitcher from '../components/PaletteSwitcher.tsx';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  path?: string;
+}
+
+const { title, description = PROFILE.description, image, path = Astro.url.pathname } = Astro.props;
+const fullTitle = title ? `${title} | ${PROFILE.shortName}` : `${PROFILE.shortName} | ${PROFILE.role}`;
+const canonical = new URL(path, Astro.site);
+const ogImage = new URL(image ?? '/og.png', Astro.site);
+const nav = [
+  { href: '/projects/', label: '~/projects' },
+  { href: '/#log', label: '~/log' },
+  { href: '/#contact', label: '~/contact' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0a0d0b" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500&display=swap"
+    />
+    <script is:inline>
+      try {
+        const p = localStorage.getItem('palette');
+        if (p) document.documentElement.dataset.palette = p;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="sr-only" href="#main">Skip to content</a>
+    <header class="bar">
+      <div class="wrap bar-inner">
+        <a class="brand" href="/">{PROFILE.handle}<span class="k cursor">_</span></a>
+        <nav aria-label="Main">
+          {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="foot">
+      <div class="wrap foot-inner">
+        <span class="d">© {new Date().getFullYear()} {PROFILE.name}. built with astro, react and too much coffee.</span>
+        <PaletteSwitcher client:idle />
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(10 13 11 / 0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 56px; }
+  .brand { color: var(--txt); font-weight: 500; }
+  .cursor { animation: blink 1s steps(1) infinite; }
+  nav { display: flex; gap: clamp(12px, 3vw, 24px); font-size: 13px; }
+  nav a { color: var(--dim); }
+  nav a:hover { color: var(--acc); text-decoration: none; }
+  .foot { border-top: 1px solid var(--line); padding-block: 24px; font-size: 12px; }
+  .foot-inner { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+  @media (max-width: 520px) {
+    nav a:nth-child(2) { display: none; }
+  }
+</style>
