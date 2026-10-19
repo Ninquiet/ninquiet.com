@@ -11,14 +11,13 @@ export default function GlyphBackground() {
     if (!canvas || !host) return;
 
     const field = new GlyphField(canvas, readAccents());
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const resizeObserver = new ResizeObserver(() => field.resize());
     resizeObserver.observe(canvas);
     field.resize();
 
     const visibility = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !reducedMotion.matches) field.start();
+      if (entry.isIntersecting) field.start();
       else field.stop();
     });
     visibility.observe(canvas);

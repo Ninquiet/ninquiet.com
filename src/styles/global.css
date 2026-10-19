@@ -88,5 +88,4 @@ h1, h2, h3 { font-weight: 500; line-height: 1.15; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition: none !important; }
 }

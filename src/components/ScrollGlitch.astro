@@ -24,8 +24,7 @@
   import { ScrollGlitch } from '../lib/scrollGlitch';
 
   const root = document.getElementById('scroll-glitch');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (root && !reduced) {
+  if (root) {
     new ScrollGlitch({
       root,
       displacement: root.querySelector<SVGFEDisplacementMapElement>('#edge-glitch-map')!,
