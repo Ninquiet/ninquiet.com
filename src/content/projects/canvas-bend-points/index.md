@@ -6,6 +6,8 @@ tags: ["typescript", "obsidian plugin", "tests", "github actions"]
 summary: "Draggable bend points, live route previews, and movable labels for Obsidian Canvas edges."
 version: "v0.1.6"
 license: "MIT"
+cover: "./cover.webp"
+video: "/media/canvas-bend-points.mp4"
 featured: true
 links:
   - label: "GitHub"

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { PALETTES, PALETTE_EVENT, applyPalette, currentPalette, type Palette } from '../lib/palette';
+import { DEFAULT_PALETTE, PALETTES, PALETTE_EVENT, applyPalette, currentPalette, type Palette } from '../lib/palette';
 import styles from './PaletteSwitcher.module.css';
 
 export default function PaletteSwitcher() {
-  const [active, setActive] = useState<Palette>('phosphor');
+  const [active, setActive] = useState<Palette>(DEFAULT_PALETTE);
 
   useEffect(() => {
     setActive(currentPalette());

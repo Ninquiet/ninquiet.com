@@ -20,9 +20,10 @@ interface Props {
 }
 
 const { project, newer, older } = Astro.props;
-const { title, summary, cover, tags, date, version, license, links, category, legacy } = project.data;
+const { title, summary, cover, video, tags, date, version, license, links, category, legacy } = project.data;
 const { Content } = await render(project);
 const ogImage = cover ? (await getImage({ src: cover, width: 1200, format: 'jpg' })).src : undefined;
+const poster = video && cover ? (await getImage({ src: cover, width: 1120, format: 'webp' })).src : undefined;
 ---
 
 <Base title={title} description={summary} image={ogImage}>
@@ -52,7 +53,11 @@ const ogImage = cover ? (await getImage({ src: cover, width: 1200, format: 'jpg'
       }
     </header>
 
-    {cover && (
+    {video ? (
+      <figure class="cover">
+        <video src={video} poster={poster} controls muted loop playsinline preload="metadata" data-autoplay />
+      </figure>
+    ) : cover && (
       <figure class="cover">
         <Image src={cover} alt={title} widths={[720, 1120]} sizes="(max-width: 1160px) 100vw, 1120px" loading="eager" />
       </figure>
@@ -81,6 +86,7 @@ const ogImage = cover ? (await getImage({ src: cover, width: 1200, format: 'jpg'
   .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .links { margin-top: 16px; gap: 16px; font-size: 14px; }
   .cover { margin: 40px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .cover video { display: block; width: 100%; height: auto; background: #000; }
   .prose { max-width: 760px; font-size: 15px; }
   .prose :global(h2) { font-family: var(--display); font-size: 26px; margin: 40px 0 12px; }
   .prose :global(h2)::before { content: '## '; color: var(--acc); font-family: var(--mono); font-size: 18px; }

@@ -1,21 +1,23 @@
-export const PALETTES = ['phosphor', 'amber', 'synthwave'] as const;
+export const PALETTES = ['synthwave', 'phosphor', 'amber'] as const;
 
 export type Palette = (typeof PALETTES)[number];
 
 export const PALETTE_EVENT = 'palettechange';
+
+export const DEFAULT_PALETTE: Palette = 'synthwave';
 
 export function isPalette(value: string): value is Palette {
   return (PALETTES as readonly string[]).includes(value);
 }
 
 export function currentPalette(): Palette {
-  const value = document.documentElement.dataset.palette ?? 'phosphor';
-  return isPalette(value) ? value : 'phosphor';
+  const value = document.documentElement.dataset.palette ?? DEFAULT_PALETTE;
+  return isPalette(value) ? value : DEFAULT_PALETTE;
 }
 
 export function applyPalette(palette: Palette): void {
   const root = document.documentElement;
-  if (palette === 'phosphor') delete root.dataset.palette;
+  if (palette === DEFAULT_PALETTE) delete root.dataset.palette;
   else root.dataset.palette = palette;
   try {
     localStorage.setItem('palette', palette);

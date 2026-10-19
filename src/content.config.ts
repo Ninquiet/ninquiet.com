@@ -13,6 +13,7 @@ const projects = defineCollection({
       tags: z.array(z.string()).default([]),
       summary: z.string(),
       cover: image().optional(),
+      video: z.string().startsWith('/media/').optional(),
       version: z.string().optional(),
       license: z.string().optional(),
       featured: z.boolean().default(false),

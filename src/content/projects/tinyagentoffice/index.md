@@ -6,6 +6,8 @@ tags: ["electron", "react", "typescript", "sqlite", "multi-agent"]
 summary: "A tiny office where AI agents coordinate their work, with roles, reviews, and a dashboard to watch it all."
 version: "v0.1.1"
 license: "source-available (PolyForm Noncommercial)"
+cover: "./dashboard.webp"
+video: "/media/tinyagentoffice.mp4"
 featured: true
 links:
   - label: "GitHub"
@@ -24,3 +26,5 @@ Instead of one long model session that loses focus, it organizes several agents 
 ## The loop
 
 Execution agents do the work, a senior reviewer role checks it before it reaches me, and if I reject a result the task goes back into the system for reassignment. Work is not just marked as done; it is reviewed, validated, and iterated.
+
+![TinyAgentOffice blueprints view](./blueprints.webp)

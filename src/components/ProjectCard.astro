@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import { CATEGORY_LABELS } from '../data/categories';
 import { fileName, permissions, type Project } from '../lib/projects';
 
@@ -9,14 +9,17 @@ interface Props {
 }
 
 const { project, compact = false } = Astro.props;
-const { title, summary, cover, tags, date, version, category } = project.data;
+const { title, summary, cover, video, tags, date, version, category } = project.data;
 const glyphs = '01<>/{}[]#*+=~'.repeat(40);
+const poster = video && cover ? (await getImage({ src: cover, width: 720, format: 'webp' })).src : undefined;
 ---
 
 <a class:list={['card', { compact }]} href={`/projects/${project.id}/`} data-category={category}>
   <div class="media">
     {
-      cover ? (
+      video ? (
+        <video src={video} poster={poster} muted loop playsinline preload="none" data-autoplay aria-hidden="true" />
+      ) : cover ? (
         <Image src={cover} alt="" widths={[360, 720]} sizes="(max-width: 700px) 100vw, 360px" loading="lazy" />
       ) : (
         <div class="placeholder" aria-hidden="true">
@@ -60,8 +63,8 @@ const glyphs = '01<>/{}[]#*+=~'.repeat(40);
   .card:hover .glitch { animation: glitch 0.35s steps(2) 2; }
   .media { aspect-ratio: 16 / 9; border-bottom: 1px solid var(--line); background: #0d120f; overflow: hidden; }
   .compact .media { aspect-ratio: 16 / 10; }
-  .media :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: top; filter: saturate(0.85); transition: filter 0.3s, transform 0.4s; }
-  .card:hover .media :global(img) { filter: saturate(1); transform: scale(1.03); }
+  .media :global(img), .media video { width: 100%; height: 100%; object-fit: cover; object-position: top; filter: saturate(0.85); transition: filter 0.3s, transform 0.4s; display: block; }
+  .card:hover .media :global(img), .card:hover .media video { filter: saturate(1); transform: scale(1.03); }
   .placeholder { position: relative; height: 100%; display: grid; place-items: center; overflow: hidden; }
   .noise {
     position: absolute;

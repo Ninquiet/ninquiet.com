@@ -5,8 +5,8 @@
   --line: #1f2a23;
   --txt: #c9d4cd;
   --dim: #7a8a80;
-  --acc: #3ddc84;
-  --acc2: #ff5fa2;
+  --acc: #5ce1e6;
+  --acc2: #c77dff;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   --display: 'Space Grotesk', system-ui, sans-serif;
   --max: 1120px;
@@ -15,7 +15,7 @@
 }
 
 :root[data-palette='amber'] { --acc: #f5b83d; --acc2: #ff6b4a; }
-:root[data-palette='synthwave'] { --acc: #5ce1e6; --acc2: #c77dff; }
+:root[data-palette='phosphor'] { --acc: #3ddc84; --acc2: #ff5fa2; }
 
 *, *::before, *::after { box-sizing: border-box; }
 

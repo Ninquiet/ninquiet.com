@@ -1,0 +1,74 @@
+<div class="scroll-glitch" id="scroll-glitch" aria-hidden="true">
+  <svg width="0" height="0" focusable="false">
+    <filter id="edge-glitch" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence id="edge-glitch-noise" type="fractalNoise" baseFrequency="0.0001 0.06" numOctaves="1" seed="3" result="noise" />
+      <feComponentTransfer in="noise" result="bands">
+        <feFuncR type="discrete" tableValues="0.5 0 1 0.5 0.5 1 0 0.5" />
+        <feFuncG type="discrete" tableValues="0.5" />
+      </feComponentTransfer>
+      <feDisplacementMap id="edge-glitch-map" in="SourceGraphic" in2="bands" scale="0" xChannelSelector="R" yChannelSelector="G" result="shifted" />
+      <feOffset id="edge-glitch-red" in="shifted" dx="0" result="redShift" />
+      <feColorMatrix in="redShift" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red" />
+      <feColorMatrix in="shifted" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green" />
+      <feOffset id="edge-glitch-blue" in="shifted" dx="0" result="blueShift" />
+      <feColorMatrix in="blueShift" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue" />
+      <feBlend in="red" in2="green" mode="screen" result="redGreen" />
+      <feBlend in="redGreen" in2="blue" mode="screen" />
+    </filter>
+  </svg>
+  <div class="band top"></div>
+  <div class="band bottom"></div>
+</div>
+
+<script>
+  import { ScrollGlitch } from '../lib/scrollGlitch';
+
+  const root = document.getElementById('scroll-glitch');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (root && !reduced) {
+    new ScrollGlitch({
+      root,
+      displacement: root.querySelector<SVGFEDisplacementMapElement>('#edge-glitch-map')!,
+      turbulence: root.querySelector<SVGFETurbulenceElement>('#edge-glitch-noise')!,
+      redOffset: root.querySelector<SVGFEOffsetElement>('#edge-glitch-red')!,
+      blueOffset: root.querySelector<SVGFEOffsetElement>('#edge-glitch-blue')!,
+    }).start();
+  }
+</script>
+
+<style>
+  .scroll-glitch { --glitch: 0; --glitch-shift: 0px; }
+  .scroll-glitch svg { position: absolute; width: 0; height: 0; }
+  .band {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 10vh;
+    z-index: 90;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .top { top: 0; mask-image: linear-gradient(to bottom, #000 55%, transparent); }
+  .bottom { bottom: 0; mask-image: linear-gradient(to top, #000 55%, transparent); }
+  .is-active .band {
+    visibility: visible;
+    backdrop-filter: hue-rotate(calc(var(--glitch) * 40deg)) contrast(calc(1 + var(--glitch) * 0.4));
+    backdrop-filter: url(#edge-glitch) hue-rotate(calc(var(--glitch) * 25deg));
+  }
+  .band::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: calc(var(--glitch) * 0.45);
+    mix-blend-mode: screen;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(3px + var(--glitch-shift) * 0.08),
+        color-mix(in srgb, var(--acc) 35%, transparent) calc(3px + var(--glitch-shift) * 0.08) calc(5px + var(--glitch-shift) * 0.08),
+        transparent calc(5px + var(--glitch-shift) * 0.08) 11px,
+        color-mix(in srgb, var(--acc2) 30%, transparent) 11px 12px
+      );
+    background-position: 0 var(--glitch-shift);
+  }
+</style>
