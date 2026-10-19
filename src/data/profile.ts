@@ -9,6 +9,7 @@ export const PROFILE = {
   years: 6,
   email: 'jesus.ninquiet@gmail.com',
   github: 'https://github.com/Ninquiet',
+  gitlab: 'https://gitlab.com/Ninquiet',
   linkedin: 'https://www.linkedin.com/in/ninquiet',
   description:
     'Agentic Software Engineer specialized in Unity and XR. 6 years building virtual worlds, tools for AI agents, and the occasional pixel that should not exist.',

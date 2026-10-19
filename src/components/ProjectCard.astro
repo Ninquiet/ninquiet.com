@@ -82,6 +82,7 @@ const poster = video && cover ? (await getImage({ src: cover, width: 720, format
   .card::after { right: 0; bottom: 0; }
   .card:hover {
     --frame: var(--acc);
+    animation: card-charge 0.42s steps(6, end) forwards, card-pop 0.3s 0.4s ease-out;
     text-decoration: none;
     transform: translate(calc(var(--px) * -1), calc(var(--px) * -2));
     box-shadow:
@@ -92,6 +93,17 @@ const poster = video && cover ? (await getImage({ src: cover, width: 720, format
       calc(var(--px) * 3) calc(var(--px) * 4) 0 0 color-mix(in srgb, var(--acc2) 55%, transparent);
   }
   .card:hover .glitch { animation: glitch 0.35s steps(2) 2; }
+  @keyframes card-charge {
+    0% { --frame: var(--acc2); }
+    30% { --frame: #ffffff; }
+    55% { --frame: #ffffff; }
+    100% { --frame: var(--acc); }
+  }
+  @keyframes card-pop {
+    0% { scale: 1; }
+    40% { scale: 1.025; }
+    100% { scale: 1; }
+  }
   .media { aspect-ratio: 16 / 9; background: #0d120f; overflow: hidden; }
   .compact .media { aspect-ratio: 16 / 10; }
   .media :global(img), .media video { width: 100%; height: 100%; object-fit: cover; object-position: top; filter: saturate(0.85); transition: filter 0.3s, transform 0.4s; display: block; }

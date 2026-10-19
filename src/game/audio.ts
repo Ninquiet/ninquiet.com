@@ -93,6 +93,15 @@ export class Sfx {
     [523, 659, 784, 1047, 784, 1047].forEach((f, i) => this.tone(f, f, 0.13, 'square', 0.9, i * 0.1));
   }
 
+  alert(): void {
+    this.tone(880, 880, 0.06, 'square', 0.6);
+    this.tone(1175, 1175, 0.08, 'square', 0.6, 0.08);
+  }
+
+  zap(): void {
+    this.tone(1600, 200, 0.18, 'sawtooth', 0.6);
+  }
+
   whoosh(): void {
     this.tone(200, 900, 0.5, 'triangle', 0.5);
   }

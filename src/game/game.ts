@@ -1,15 +1,19 @@
+import { AmbientDrones } from './ambient';
 import { Sfx } from './audio';
 import { CityBackground } from './cityBackground';
-import { ENEMY, HEADER_SELECTOR, STAR_SIZE } from './constants';
+import { DRONE, ENEMY, HEADER_SELECTOR, STAR_SIZE, ZAP_RADIUS } from './constants';
 import { DomWorld, type Point } from './domWorld';
 import { Effects } from './effects';
+import { Drone } from './drone';
 import { Enemy } from './enemy';
+import type { Hostile, HostileContext } from './hostile';
 import { drawBanner, drawBubble, drawHint, drawHud, formatTime, PIXEL_FONT, type Accents } from './hud';
 import { Input } from './input';
 import { drawSprite } from './pixelArt';
 import { centerX, feetY, overlaps } from './physics';
 import { Player } from './player';
 import { STAR_COLORS, starSprite } from './sprites';
+import { distance } from './steering';
 
 export type Phase = 'idle' | 'playing' | 'over' | 'returning';
 type Result = 'win' | 'lose' | 'quit';
@@ -43,7 +47,10 @@ export class Game {
   private readonly input: Input;
   private readonly city: CityBackground;
   private cityDrawn = false;
-  private enemies: Enemy[] = [];
+  private hostiles: Hostile[] = [];
+  private readonly ambient = new AmbientDrones();
+  private droneRespawns: number[] = [];
+  private suppressClick = false;
   private stars: Star[] = [];
   private phase: Phase = 'idle';
   private result: Result = 'lose';
@@ -84,6 +91,8 @@ export class Game {
     this.input.attach();
     window.addEventListener('resize', this.resize);
     window.addEventListener('pointermove', this.onPointer, { passive: true });
+    window.addEventListener('pointerdown', this.onPointerDown, { capture: true });
+    window.addEventListener('click', this.onClickCapture, { capture: true });
     this.options.hitbox.addEventListener('pointerenter', this.onHoverIn);
     this.options.hitbox.addEventListener('pointerleave', this.onHoverOut);
     this.options.hitbox.addEventListener('focus', this.onHoverIn);
@@ -100,6 +109,8 @@ export class Game {
     this.input.detach();
     window.removeEventListener('resize', this.resize);
     window.removeEventListener('pointermove', this.onPointer);
+    window.removeEventListener('pointerdown', this.onPointerDown, { capture: true });
+    window.removeEventListener('click', this.onClickCapture, { capture: true });
     this.options.hitbox.removeEventListener('pointerenter', this.onHoverIn);
     this.options.hitbox.removeEventListener('pointerleave', this.onHoverOut);
     this.options.hitbox.removeEventListener('focus', this.onHoverIn);
@@ -121,8 +132,11 @@ export class Game {
     this.sfx.start();
     this.world.refresh();
     this.stars = this.world.starPositions().map((p) => ({ x: p.x, y: p.y - 30, taken: false }));
-    this.enemies = [];
+    this.ambient.clear(this.effects, this.sfx);
+    this.hostiles = [];
     this.respawns = [];
+    this.droneRespawns = [];
+    this.spawnHunters(DRONE.gameCount);
     this.spawnClock = 0;
     this.spawnIndex = 0;
     this.elapsed = 0;
@@ -191,7 +205,61 @@ export class Game {
 
   private onPointer = (event: PointerEvent): void => {
     this.pointerClient = { x: event.clientX, y: event.clientY };
+    const point = { x: event.clientX + window.scrollX, y: event.clientY + window.scrollY };
+    const aiming = event.pointerType === 'mouse' && this.hostileAt(point, ZAP_RADIUS) !== null;
+    document.documentElement.classList.toggle('bitdroid-aim', aiming);
   };
+
+  private onPointerDown = (event: PointerEvent): void => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if ((event.target as Element | null)?.closest('[data-no-zap]')) return;
+    const point = { x: event.clientX + window.scrollX, y: event.clientY + window.scrollY };
+    const hostile = this.hostileAt(point, event.pointerType === 'touch' ? ZAP_RADIUS + 14 : ZAP_RADIUS);
+    if (!hostile) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.suppressClick = true;
+    this.zap(hostile);
+  };
+
+  private onClickCapture = (event: MouseEvent): void => {
+    if (!this.suppressClick) return;
+    this.suppressClick = false;
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  private hostileAt(point: Point, radius: number): Hostile | null {
+    if (this.phase === 'idle') return this.ambient.at(point, radius);
+    if (this.phase !== 'playing') return null;
+    return this.hostiles.find((h) => h.alive && distance(h.center(), point) < radius) ?? null;
+  }
+
+  private zap(hostile: Hostile): void {
+    const c = hostile.center();
+    this.sfx.resume();
+    hostile.explode(this.effects, this.sfx);
+    this.sfx.zap();
+    vibrate(20);
+    this.effects.popup('ZAP!', c.x, c.y - 26, '#ffffff');
+    if (this.phase === 'playing') this.onHostileKilled(hostile);
+  }
+
+  private onHostileKilled(hostile: Hostile): void {
+    if (hostile instanceof Drone) this.droneRespawns.push(this.spawnClock + DRONE.respawnDelay);
+    else this.respawns.push(this.spawnClock + ENEMY.respawnDelay);
+  }
+
+  private hostileContext(dt: number, withTarget: boolean): HostileContext {
+    return { dt, target: withTarget ? this.player.body : null, world: this.world, effects: this.effects, sfx: this.sfx, pointer: this.pointerWorld() };
+  }
+
+  private spawnHunters(count: number): void {
+    const zones = this.world.cardZones(DRONE.hover).sort(() => Math.random() - 0.5);
+    const start = this.player.feet();
+    const far = zones.filter((z) => Math.abs(z.y - start.y) > 260);
+    for (const zone of (far.length >= count ? far : zones).slice(0, count)) this.hostiles.push(new Drone(zone, 'hunter'));
+  }
 
   private onHoverIn = (): void => {
     this.player.hovered = true;
@@ -237,7 +305,7 @@ export class Game {
     else if (this.phase === 'playing') this.updatePlaying(dt);
     else if (this.phase === 'over') this.updateOver(dt);
     else if (this.phase === 'returning' && done) {
-      this.enemies = [];
+      this.hostiles = [];
       this.stars = [];
       this.setPhase('idle');
     }
@@ -256,6 +324,7 @@ export class Game {
 
   private updateIdle(dt: number): void {
     this.positionHitbox();
+    this.ambient.update(this.hostileContext(dt, false), this.world, { top: window.scrollY, bottom: window.scrollY + this.height });
     if (this.player.hovered) return;
     this.bubbleTime = Math.max(0, this.bubbleTime - dt);
     this.bubbleTimer -= dt;
@@ -289,25 +358,31 @@ export class Game {
       this.spawnEnemy();
       return false;
     });
+    this.droneRespawns = this.droneRespawns.filter((at) => {
+      if (this.spawnClock < at) return true;
+      if (this.hostiles.filter((h) => h instanceof Drone && !h.dead).length < DRONE.maxGame) this.spawnHunters(1);
+      return false;
+    });
 
     const body = this.player.body;
-    for (const enemy of this.enemies) {
-      enemy.update(dt, body, this.world, this.effects, this.sfx);
-      if (!enemy.alive || !overlaps(body, enemy.body, 4)) continue;
-      const stomping = body.vy > 120 && feetY(body) - enemy.body.y < 22;
+    const context = this.hostileContext(dt, true);
+    for (const hostile of this.hostiles) {
+      hostile.update(context);
+      if (!hostile.alive || !overlaps(body, hostile.body, 4)) continue;
+      const stomping = body.vy > 120 && feetY(body) - hostile.body.y < 22;
       if (stomping) {
-        enemy.explode(this.effects, this.sfx);
+        hostile.explode(this.effects, this.sfx);
         this.player.stomp();
         this.sfx.stomp();
         vibrate(25);
-        this.effects.popup('STOMP!', centerX(enemy.body), enemy.body.y - 10, this.accents.acc);
-        this.respawns.push(this.spawnClock + ENEMY.respawnDelay);
+        this.effects.popup('STOMP!', centerX(hostile.body), hostile.body.y - 10, this.accents.acc);
+        this.onHostileKilled(hostile);
       } else if (this.player.invulnerable === 0) {
         this.finish('lose');
         return;
       }
     }
-    this.enemies = this.enemies.filter((enemy) => enemy.state !== 'dead');
+    this.hostiles = this.hostiles.filter((hostile) => !hostile.dead);
 
     for (const star of this.stars) {
       if (star.taken) continue;
@@ -329,18 +404,19 @@ export class Game {
     this.overTimer += dt;
     const first = this.result === 'win' ? 0.2 : this.result === 'quit' ? 0.05 : 0.55;
     const gap = this.result === 'quit' ? 0.12 : 0.2;
-    this.enemies.forEach((enemy, i) => {
-      if (this.overTimer >= first + i * gap) enemy.explode(this.effects, this.sfx);
+    this.hostiles.forEach((hostile, i) => {
+      if (this.overTimer >= first + i * gap) hostile.explode(this.effects, this.sfx);
     });
     const hold = this.result === 'quit' ? 0.5 : 2.6;
-    if (this.overTimer >= Math.max(hold, first + this.enemies.length * gap)) this.beginReturn();
+    if (this.overTimer >= Math.max(hold, first + this.hostiles.length * gap)) this.beginReturn();
   }
 
   private spawnEnemy(): void {
+    if (this.hostiles.filter((h) => h instanceof Enemy && !h.dead).length >= ENEMY.maxAlive) return;
     const playerScreenX = centerX(this.player.body) - window.scrollX;
     let x = rand(60, this.width - 60);
     for (let i = 0; i < 8 && Math.abs(x - playerScreenX) < 220; i++) x = rand(60, this.width - 60);
-    this.enemies.push(new Enemy(x + window.scrollX, window.scrollY + this.height + 10));
+    this.hostiles.push(new Enemy(x + window.scrollX, window.scrollY + this.height + 10));
   }
 
   private followCamera(dt: number): void {
@@ -383,8 +459,9 @@ export class Game {
     ctx.clip();
     ctx.translate(Math.round(-window.scrollX + sx), Math.round(-window.scrollY + sy));
     this.drawStars(ctx);
-    const viewportBottom = window.scrollY + this.height;
-    for (const enemy of this.enemies) enemy.draw(ctx, viewportBottom, this.accents.acc2);
+    const view = { viewportBottom: window.scrollY + this.height, accent: this.accents.acc2 };
+    for (const hostile of this.hostiles) hostile.draw(ctx, view);
+    this.ambient.draw(ctx, view);
     this.player.draw(ctx);
     this.effects.draw(ctx);
     if (this.phase === 'idle') this.drawIdleExtras(ctx);

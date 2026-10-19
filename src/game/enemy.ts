@@ -2,6 +2,7 @@ import type { Sfx } from './audio';
 import { ENEMY } from './constants';
 import type { Point } from './domWorld';
 import type { Effects } from './effects';
+import type { Hostile, HostileContext, HostileView } from './hostile';
 import { drawSprite } from './pixelArt';
 import { centerX, createBody, dropThrough, feetY, step, type Body, type Platform, type World } from './physics';
 import { BUG_COLORS, bugSprite } from './sprites';
@@ -97,7 +98,7 @@ export class EnemyBrain {
   }
 }
 
-export class Enemy {
+export class Enemy implements Hostile {
   readonly body = createBody(ENEMY.width, ENEMY.height);
   readonly brain = new EnemyBrain();
   state: State = 'warning';
@@ -116,7 +117,15 @@ export class Enemy {
     return this.state === 'rising' || this.state === 'active';
   }
 
-  update(dt: number, target: Body, world: World, effects: Effects, sfx: Sfx): void {
+  get dead(): boolean {
+    return this.state === 'dead';
+  }
+
+  center(): Point {
+    return { x: centerX(this.body), y: this.body.y + this.body.h / 2 };
+  }
+
+  update({ dt, target, world, effects, sfx }: HostileContext): void {
     this.timer += dt;
     this.glitch = Math.max(0, this.glitch - dt);
     if (this.state === 'warning') {
@@ -132,7 +141,7 @@ export class Enemy {
     if (!this.alive) return;
 
     this.thinkTimer -= dt;
-    if (this.thinkTimer <= 0 && this.state === 'active') {
+    if (this.thinkTimer <= 0 && this.state === 'active' && target) {
       this.brain.think(this.body, target, world, ENEMY.thinkInterval);
       this.thinkTimer = ENEMY.thinkInterval;
     }
@@ -173,7 +182,7 @@ export class Enemy {
     sfx.explode();
   }
 
-  draw(ctx: CanvasRenderingContext2D, viewportBottom: number, accent: string): void {
+  draw(ctx: CanvasRenderingContext2D, { viewportBottom, accent }: HostileView): void {
     if (this.state === 'dead') return;
     if (this.state === 'warning') {
       const blink = Math.floor(this.timer * 10) % 2 === 0;

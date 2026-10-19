@@ -135,6 +135,58 @@ export function bugSprite(frame: 0 | 1): Sprite {
 
 export const BUG_COLORS = ['#c13cff', '#6b1c99', '#ff2244', '#ffffff'];
 
+export type DroneLook = -1 | 0 | 1;
+
+const DRONE_PALETTE: Palette = {
+  K: '#122008',
+  G: '#a6ff3c',
+  g: '#5fae14',
+  W: '#f2ffe0',
+  E: '#ff9f1c',
+  R: '#ff2244',
+  P: '#1a0a00',
+  L: '#ffd166',
+  b: '#c9d1e0',
+};
+
+const DRONE_EYES: Record<DroneLook, [string, string, string]> = {
+  [-1]: ['IIIWW', 'PIIWW', 'IIIWW'],
+  [0]: ['WIIIW', 'WIPIW', 'WIIIW'],
+  [1]: ['WWIII', 'WWIIP', 'WWIII'],
+};
+
+function droneRows(propeller: 0 | 1, look: DroneLook, alert: boolean): string[] {
+  const iris = alert ? 'R' : 'E';
+  const [top, mid, bottom] = DRONE_EYES[look].map((row) => row.replace(/I/g, iris));
+  return [
+    propeller === 0 ? '..bbbbKbbbb..' : '....bbKbb....',
+    '......K......',
+    '....KKKKK....',
+    '..KgGGGGGgK..',
+    '.KgGWWWWWGgK.',
+    `.KGW${top}WGK.`,
+    `KgGW${mid}WGgK`,
+    `.KGW${bottom}WGK.`,
+    '.KgGWWWWWGgK.',
+    '..KgGGGGGgK..',
+    '...KLKKKLK...',
+  ];
+}
+
+const droneCache = new Map<string, Sprite>();
+
+export function droneSprite(propeller: 0 | 1, look: DroneLook, alert: boolean): Sprite {
+  const key = `${propeller}|${look}|${alert}`;
+  let sprite = droneCache.get(key);
+  if (!sprite) {
+    sprite = buildSprite(droneRows(propeller, look, alert), DRONE_PALETTE, PIXEL);
+    droneCache.set(key, sprite);
+  }
+  return sprite;
+}
+
+export const DRONE_COLORS = ['#a6ff3c', '#5fae14', '#ff9f1c', '#f2ffe0'];
+
 const STAR_ROWS = [
   '....K....',
   '...KYK...',

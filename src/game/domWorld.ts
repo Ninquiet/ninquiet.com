@@ -6,6 +6,12 @@ export interface Point {
   y: number;
 }
 
+export interface Zone {
+  x1: number;
+  x2: number;
+  y: number;
+}
+
 const insetOf = (el: Element) => Number((el as HTMLElement).dataset.bitdroidInset ?? 0);
 
 function documentRect(el: Element) {
@@ -38,6 +44,19 @@ export class DomWorld implements World {
     if (!el) return null;
     const rect = documentRect(el);
     return { x: rect.x + rect.w * 0.5, y: Math.round(rect.y + rect.h * insetOf(el)) };
+  }
+
+  cardZones(hover: number): Zone[] {
+    return this.starAnchors.map((el) => {
+      const rect = documentRect(el);
+      return { x1: rect.x + 30, x2: rect.x + rect.w - 30, y: rect.y - hover };
+    });
+  }
+
+  zonesBetween(top: number, bottom: number, hover: number): Zone[] {
+    return this.platforms
+      .filter((p) => p.w > 140 && p.y - hover > top && p.y < bottom)
+      .map((p) => ({ x1: p.x + 20, x2: p.x + p.w - 20, y: p.y - hover }));
   }
 
   starPositions(): Point[] {

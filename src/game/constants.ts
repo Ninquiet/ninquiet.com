@@ -31,7 +31,8 @@ export const ENEMY = {
   thinkInterval: 0.12,
   reachHeight: 200,
   reachDistance: 280,
-  spawnSchedule: [1.4, 13, 30],
+  spawnSchedule: [1.4, 7, 13, 20, 28, 36],
+  maxAlive: 6,
   respawnDelay: 3,
   warningTime: 0.7,
 };
@@ -59,3 +60,28 @@ export const PLATFORM_SELECTORS = [
 export const STAR_SELECTOR = 'main .card';
 export const PERCH_SELECTOR = '[data-bitdroid-perch]';
 export const HEADER_SELECTOR = 'body > header';
+
+export const DRONE = {
+  width: 30,
+  height: 26,
+  patrolSpeed: 85,
+  pursueSpeed: 235,
+  returnSpeed: 160,
+  fleeSpeed: 170,
+  maxForce: 560,
+  detectRadius: 230,
+  loseRadius: 420,
+  fleeRadius: 110,
+  alertTime: 0.45,
+  slowRadius: 70,
+  hover: 46,
+  gameCount: 4,
+  maxGame: 5,
+  respawnDelay: 6,
+  ambientMax: 3,
+  ambientFirstSpawn: 5,
+  ambientInterval: [9, 18] as const,
+  ambientLifetime: [40, 70] as const,
+};
+
+export const ZAP_RADIUS = 34;

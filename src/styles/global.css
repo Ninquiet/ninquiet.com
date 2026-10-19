@@ -1,3 +1,9 @@
+@property --frame {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1f2a23;
+}
+
 :root {
   --bg: #0a0d0b;
   --panel: #101512;
@@ -73,6 +79,27 @@ h1, h2, h3 { font-weight: 500; line-height: 1.15; }
 .section { padding-block: 56px; border-top: 1px solid var(--line); }
 
 :root[data-game] #hover-backdrop { opacity: 0; transition: opacity 0.3s; }
+
+.bitdroid-aim,
+.bitdroid-aim * { cursor: crosshair !important; }
+
+.pixel-spark {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  background: var(--c);
+  pointer-events: none;
+  z-index: 3;
+  animation: pixel-spark var(--d) steps(7) forwards;
+}
+
+@keyframes pixel-spark {
+  0% { transform: translate(0, 0); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+}
 
 :root[data-game='playing'],
 :root[data-game='playing'] body { touch-action: none; overscroll-behavior: none; }

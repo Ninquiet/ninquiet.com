@@ -53,7 +53,7 @@ export default function TouchPad({ onAction, onQuit, onToggleMute }: Props) {
   );
 
   return (
-    <div className={styles.root} onContextMenu={(event) => event.preventDefault()}>
+    <div className={styles.root} data-no-zap onContextMenu={(event) => event.preventDefault()}>
       <div className={styles.system}>
         <button type="button" className={styles.small} onClick={() => setMuted(onToggleMute())} aria-label={muted ? 'Sound on' : 'Sound off'}>
           {muted ? '♪ OFF' : '♪ ON'}

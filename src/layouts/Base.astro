@@ -4,6 +4,7 @@ import { PROFILE } from '../data/profile';
 import PaletteSwitcher from '../components/PaletteSwitcher.tsx';
 import ScrollGlitch from '../components/ScrollGlitch.astro';
 import HoverBackdrop from '../components/HoverBackdrop.astro';
+import CardEffects from '../components/CardEffects.astro';
 
 interface Props {
   title?: string;
@@ -72,6 +73,7 @@ const nav = [
       </div>
     </footer>
     <HoverBackdrop />
+    <CardEffects />
     <ScrollGlitch />
     <script>
       import { initAutoplayVideos } from '../lib/autoplayVideos';

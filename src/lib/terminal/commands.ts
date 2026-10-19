@@ -112,6 +112,7 @@ const contact: Command = {
   run: () => [
     ['mail     ', k(PROFILE.email, `mailto:${PROFILE.email}`)],
     ['github   ', k('github.com/Ninquiet', PROFILE.github)],
+    ['gitlab   ', k('gitlab.com/Ninquiet', PROFILE.gitlab)],
     ['linkedin ', k('linkedin.com/in/ninquiet', PROFILE.linkedin)],
   ],
 };
