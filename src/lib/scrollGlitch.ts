@@ -13,7 +13,7 @@ export interface ScrollGlitchOptions {
   decay: number;
 }
 
-const DEFAULTS: ScrollGlitchOptions = { velocityForMax: 2.5, maxDisplacement: 46, maxSplit: 7, decay: 0.86 };
+const DEFAULTS: ScrollGlitchOptions = { velocityForMax: 1.2, maxDisplacement: 60, maxSplit: 9, decay: 0.9 };
 
 export class ScrollGlitch {
   private readonly options: ScrollGlitchOptions;
