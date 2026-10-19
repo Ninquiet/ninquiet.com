@@ -53,11 +53,12 @@ export const PLATFORM_SELECTORS = [
   'main .archive a',
   'main .commit',
   'main .cta',
+  'main #contact .chips .tag',
   'main .mail',
   'body > footer',
 ];
 
-export const STAR_SELECTOR = 'main .card';
+export const STAR_SELECTOR = 'main .card, main #contact .chips .tag';
 export const PERCH_SELECTOR = '[data-bitdroid-perch]';
 export const HEADER_SELECTOR = 'body > header';
 
@@ -85,3 +86,27 @@ export const DRONE = {
 };
 
 export const ZAP_RADIUS = 34;
+
+export const SPIDER = {
+  width: 60,
+  height: 58,
+  ride: 44,
+  speed: 125,
+  accel: 900,
+  gravity: 2300,
+  maxFall: 1150,
+  wakeRadius: 380,
+  wakeTime: 0.75,
+  crouchTime: 0.34,
+  leapTime: 0.72,
+  leapRange: 560,
+  leapCooldown: 1.6,
+  thigh: 34,
+  shin: 40,
+  stepThreshold: 30,
+  stepTime: 0.15,
+  hp: 3,
+  speedByStage: [1, 1.4, 1.85],
+  hitRadius: 50,
+  perchSelector: 'main #contact .cta',
+};

@@ -1,7 +1,7 @@
 import { AmbientDrones } from './ambient';
 import { Sfx } from './audio';
 import { CityBackground } from './cityBackground';
-import { DRONE, ENEMY, HEADER_SELECTOR, STAR_SIZE, ZAP_RADIUS } from './constants';
+import { DRONE, ENEMY, HEADER_SELECTOR, SPIDER, STAR_SIZE, ZAP_RADIUS } from './constants';
 import { DomWorld, type Point } from './domWorld';
 import { Effects } from './effects';
 import { Drone } from './drone';
@@ -11,7 +11,9 @@ import { drawBanner, drawBubble, drawHint, drawHud, formatTime, PIXEL_FONT, type
 import { Input } from './input';
 import { drawSprite } from './pixelArt';
 import { centerX, feetY, overlaps } from './physics';
+import { CardDrop } from '../lib/cardDrop';
 import { Player } from './player';
+import { Spider } from './spider';
 import { STAR_COLORS, starSprite } from './sprites';
 import { distance } from './steering';
 
@@ -49,6 +51,7 @@ export class Game {
   private cityDrawn = false;
   private hostiles: Hostile[] = [];
   private readonly ambient = new AmbientDrones();
+  private readonly cardDrop = new CardDrop();
   private droneRespawns: number[] = [];
   private suppressClick = false;
   private stars: Star[] = [];
@@ -81,6 +84,10 @@ export class Game {
     this.accents = options.readAccents();
     this.input = new Input({ onQuit: () => this.quit(), onMute: () => this.sfx.toggleMute() });
     this.city = new CityBackground(options.background);
+    this.effects.onExplode = (x, y) => {
+      this.cardDrop.near(x, y, 120);
+      this.world.refresh();
+    };
   }
 
   mount(): void {
@@ -130,13 +137,15 @@ export class Game {
     if (this.phase !== 'idle') return;
     this.sfx.resume();
     this.sfx.start();
+    this.cardDrop.restoreAll();
     this.world.refresh();
-    this.stars = this.world.starPositions().map((p) => ({ x: p.x, y: p.y - 30, taken: false }));
+    this.stars = this.world.starPositions().flatMap((p) => (p ? [{ x: p.x, y: p.y - 30, taken: false }] : []));
     this.ambient.clear(this.effects, this.sfx);
     this.hostiles = [];
     this.respawns = [];
     this.droneRespawns = [];
     this.spawnHunters(DRONE.gameCount);
+    this.spawnSpider();
     this.spawnClock = 0;
     this.spawnIndex = 0;
     this.elapsed = 0;
@@ -232,26 +241,38 @@ export class Game {
   private hostileAt(point: Point, radius: number): Hostile | null {
     if (this.phase === 'idle') return this.ambient.at(point, radius);
     if (this.phase !== 'playing') return null;
-    return this.hostiles.find((h) => h.alive && distance(h.center(), point) < radius) ?? null;
+    return this.hostiles.find((h) => h.alive && distance(h.center(), point) < Math.max(radius, h.hitRadius)) ?? null;
   }
 
   private zap(hostile: Hostile): void {
     const c = hostile.center();
     this.sfx.resume();
-    hostile.explode(this.effects, this.sfx);
+    const destroyed = hostile.hit(this.effects, this.sfx);
     this.sfx.zap();
     vibrate(20);
     this.effects.popup('ZAP!', c.x, c.y - 26, '#ffffff');
-    if (this.phase === 'playing') this.onHostileKilled(hostile);
+    if (destroyed && this.phase === 'playing') this.onHostileKilled(hostile);
   }
 
   private onHostileKilled(hostile: Hostile): void {
+    if (hostile instanceof Spider) {
+      const c = hostile.center();
+      this.effects.popup('BOSS DOWN!', c.x, c.y - 60, '#ffd84a');
+      return;
+    }
     if (hostile instanceof Drone) this.droneRespawns.push(this.spawnClock + DRONE.respawnDelay);
     else this.respawns.push(this.spawnClock + ENEMY.respawnDelay);
   }
 
   private hostileContext(dt: number, withTarget: boolean): HostileContext {
     return { dt, target: withTarget ? this.player.body : null, world: this.world, effects: this.effects, sfx: this.sfx, pointer: this.pointerWorld() };
+  }
+
+  private spawnSpider(): void {
+    const el = document.querySelector(SPIDER.perchSelector);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    this.hostiles.push(new Spider(rect.left + window.scrollX + rect.width * 0.6, rect.top + window.scrollY));
   }
 
   private spawnHunters(count: number): void {
@@ -306,6 +327,7 @@ export class Game {
     else if (this.phase === 'over') this.updateOver(dt);
     else if (this.phase === 'returning' && done) {
       this.hostiles = [];
+      this.cardDrop.restoreAll();
       this.stars = [];
       this.setPhase('idle');
     }
@@ -314,7 +336,7 @@ export class Game {
   private syncStars(): void {
     const positions = this.world.starPositions();
     this.stars.forEach((star, i) => {
-      const p = positions[i];
+      const p = positions[i] ?? null;
       if (p) {
         star.x = p.x;
         star.y = p.y - 30;
@@ -368,15 +390,15 @@ export class Game {
     const context = this.hostileContext(dt, true);
     for (const hostile of this.hostiles) {
       hostile.update(context);
-      if (!hostile.alive || !overlaps(body, hostile.body, 4)) continue;
+      if (!hostile.harmful || !overlaps(body, hostile.body, 4)) continue;
       const stomping = body.vy > 120 && feetY(body) - hostile.body.y < 22;
       if (stomping) {
-        hostile.explode(this.effects, this.sfx);
+        const destroyed = hostile.hit(this.effects, this.sfx);
         this.player.stomp();
         this.sfx.stomp();
         vibrate(25);
         this.effects.popup('STOMP!', centerX(hostile.body), hostile.body.y - 10, this.accents.acc);
-        this.onHostileKilled(hostile);
+        if (destroyed) this.onHostileKilled(hostile);
       } else if (this.player.invulnerable === 0) {
         this.finish('lose');
         return;

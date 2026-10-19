@@ -46,6 +46,17 @@ export class Drone implements Hostile {
     return this.state === 'dead';
   }
 
+  get harmful(): boolean {
+    return this.alive;
+  }
+
+  readonly hitRadius = 34;
+
+  hit(effects: Effects, sfx: Sfx): boolean {
+    this.explode(effects, sfx);
+    return true;
+  }
+
   center(): Point {
     return { ...this.position };
   }

@@ -15,6 +15,14 @@ export function pickForSection(projects: Project[], categories: string[], limit:
   return { shown: ordered.slice(0, limit), rest: Math.max(0, matching.length - limit) };
 }
 
+export function relatedProjects(project: Project, all: Project[], count: number): Project[] {
+  const rank = (p: Project) => (p.data.category === project.data.category ? 0 : 2) + (p.data.featured ? 0 : 1);
+  return all
+    .filter((p) => p.id !== project.id)
+    .sort((a, b) => rank(a) - rank(b) || b.data.date.getTime() - a.data.date.getTime())
+    .slice(0, count);
+}
+
 export function fileName(project: Project): string {
   const extension = CATEGORY_EXTENSIONS[project.data.category];
   return extension === '/' ? `${project.id}/` : `${project.id}${extension}`;

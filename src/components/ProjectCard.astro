@@ -67,7 +67,7 @@ const poster = video && cover ? (await getImage({ src: cover, width: 720, format
       calc(var(--px) * -1) 0 0 0 var(--frame),
       var(--px) 0 0 0 var(--frame),
       0 0 0 0 transparent;
-    transition: transform 0.18s steps(3), box-shadow 0.18s steps(2);
+    transition: box-shadow 0.18s steps(2);
   }
   .card::before,
   .card::after {
@@ -82,9 +82,8 @@ const poster = video && cover ? (await getImage({ src: cover, width: 720, format
   .card::after { right: 0; bottom: 0; }
   .card:hover {
     --frame: var(--acc);
-    animation: card-charge 0.42s steps(6, end) forwards, card-pop 0.3s 0.4s ease-out;
+    animation: card-charge 0.75s steps(8, end) forwards, card-hop 0.75s cubic-bezier(0.22, 0.8, 0.3, 1) forwards;
     text-decoration: none;
-    transform: translate(calc(var(--px) * -1), calc(var(--px) * -2));
     box-shadow:
       0 calc(var(--px) * -1) 0 0 var(--frame),
       0 var(--px) 0 0 var(--frame),
@@ -95,14 +94,17 @@ const poster = video && cover ? (await getImage({ src: cover, width: 720, format
   .card:hover .glitch { animation: glitch 0.35s steps(2) 2; }
   @keyframes card-charge {
     0% { --frame: var(--acc2); }
-    30% { --frame: #ffffff; }
-    55% { --frame: #ffffff; }
+    28% { --frame: #ffffff; }
+    50% { --frame: #ffffff; }
     100% { --frame: var(--acc); }
   }
-  @keyframes card-pop {
-    0% { scale: 1; }
-    40% { scale: 1.025; }
-    100% { scale: 1; }
+  @keyframes card-hop {
+    0% { translate: 0 0; scale: 1; }
+    28% { translate: -4px -18px; scale: 1.035 1.045; }
+    50% { translate: -4px -3px; scale: 1.03 0.97; }
+    68% { translate: -4px -11px; scale: 1.01 1.015; }
+    84% { translate: -4px -7px; scale: 1; }
+    100% { translate: -4px -8px; scale: 1; }
   }
   .media { aspect-ratio: 16 / 9; background: #0d120f; overflow: hidden; }
   .compact .media { aspect-ratio: 16 / 10; }

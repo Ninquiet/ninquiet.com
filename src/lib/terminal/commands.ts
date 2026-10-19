@@ -68,16 +68,16 @@ const open: Command = {
     if (!target) return [[p('usage: open <project>')], [d("try 'ls' to see names")]];
     if (target === 'about' || target === 'about.md') return about.run([], ctx);
     if (target === '~' || target === '/' || target === '..') {
-      ctx.navigate('/');
+      ctx.navigate('/', '~');
       return [[d('cd ~')]];
     }
     if (target === 'projects' || target === '~/projects') {
-      ctx.navigate('/projects/');
+      ctx.navigate('/projects/', '~/projects');
       return [[d('opening ~/projects ...')]];
     }
     const project = findProject(ctx, target);
     if (!project) return [[p(`no such project: ${target}`)]];
-    ctx.navigate(`/projects/${project.slug}/`);
+    ctx.navigate(`/projects/${project.slug}/`, projectLabel(project));
     return [[d('opening '), k(projectLabel(project)), d(' ...')]];
   },
   complete: (ctx) => ctx.projects.map((project) => project.slug),

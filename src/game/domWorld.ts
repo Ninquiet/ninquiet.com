@@ -1,3 +1,4 @@
+import { FALLEN_SELECTOR } from '../lib/cardDrop';
 import { PERCH_SELECTOR, PLATFORM_SELECTORS, STAR_SELECTOR } from './constants';
 import type { Platform, World } from './physics';
 
@@ -32,6 +33,7 @@ export class DomWorld implements World {
     this.platforms = [];
     for (const el of document.querySelectorAll(PLATFORM_SELECTORS.join(','))) {
       if ((el as HTMLElement).offsetParent === null && el.tagName !== 'FOOTER') continue;
+      if (el.closest(FALLEN_SELECTOR)) continue;
       const rect = documentRect(el);
       if (rect.w < 8 || rect.h <= 0) continue;
       this.platforms.push({ x: rect.x, y: Math.round(rect.y + rect.h * insetOf(el)), w: rect.w });
@@ -47,7 +49,7 @@ export class DomWorld implements World {
   }
 
   cardZones(hover: number): Zone[] {
-    return this.starAnchors.map((el) => {
+    return this.starAnchors.filter((el) => el.classList.contains('card')).map((el) => {
       const rect = documentRect(el);
       return { x1: rect.x + 30, x2: rect.x + rect.w - 30, y: rect.y - hover };
     });
@@ -59,8 +61,9 @@ export class DomWorld implements World {
       .map((p) => ({ x1: p.x + 20, x2: p.x + p.w - 20, y: p.y - hover }));
   }
 
-  starPositions(): Point[] {
+  starPositions(): Array<Point | null> {
     return this.starAnchors.map((el) => {
+      if (el.closest(FALLEN_SELECTOR)) return null;
       const rect = documentRect(el);
       return { x: rect.x + rect.w / 2, y: rect.y };
     });

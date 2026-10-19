@@ -7,7 +7,7 @@ export interface CardSparksOptions {
 
 const DEFAULTS: CardSparksOptions = {
   cardSelector: '.card',
-  delay: 380,
+  delay: 200,
   count: 16,
   colors: ['var(--acc)', 'var(--acc2)', '#ffffff'],
 };

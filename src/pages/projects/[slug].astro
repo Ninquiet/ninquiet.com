@@ -3,13 +3,14 @@ import { Image, getImage } from 'astro:assets';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { CATEGORY_LABELS } from '../../data/categories';
-import { fileName, getProjects, permissions, type Project } from '../../lib/projects';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { fileName, getProjects, permissions, relatedProjects, type Project } from '../../lib/projects';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
   return projects.map((project, index) => ({
     params: { slug: project.id },
-    props: { project, newer: projects[index - 1], older: projects[index + 1] },
+    props: { project, newer: projects[index - 1], older: projects[index + 1], related: relatedProjects(project, projects, 3), total: projects.length },
   }));
 }
 
@@ -17,9 +18,11 @@ interface Props {
   project: Project;
   newer?: Project;
   older?: Project;
+  related: Project[];
+  total: number;
 }
 
-const { project, newer, older } = Astro.props;
+const { project, newer, older, related, total } = Astro.props;
 const { title, summary, cover, video, tags, date, version, license, links, category, legacy } = project.data;
 const { Content } = await render(project);
 const ogImage = cover ? (await getImage({ src: cover, width: 1200, format: 'jpg' })).src : undefined;
@@ -69,7 +72,15 @@ const poster = video && cover ? (await getImage({ src: cover, width: 1120, forma
 
     {legacy && <p class="d note">// migrated from the old wordpress portfolio</p>}
 
-    <nav class="pager" aria-label="More projects">
+    <section class="related" aria-label="More projects">
+      <p class="prompt">ls ~/projects --related <span class="d">// keep playing</span></p>
+      <div class="related-grid">
+        {related.map((item) => <ProjectCard project={item} />)}
+      </div>
+      <a class="all" href="/projects/">cd ~/projects <span class="d">// {total} levels unlocked</span></a>
+    </section>
+
+    <nav class="pager" aria-label="Previous and next project">
       {newer ? <a href={`/projects/${newer.id}/`}>← {fileName(newer)}</a> : <span />}
       <a href="/projects/">cd ..</a>
       {older ? <a href={`/projects/${older.id}/`}>{fileName(older)} →</a> : <span />}
@@ -97,6 +108,9 @@ const poster = video && cover ? (await getImage({ src: cover, width: 1120, forma
   .prose :global(.embed) { position: relative; aspect-ratio: 16 / 9; margin: 24px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .prose :global(.embed iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .note { font-size: 12px; margin-top: 40px; }
+  .related { margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--line); }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+  .all { display: inline-block; margin-top: 24px; font-size: 14px; }
   .pager {
     display: flex;
     justify-content: space-between;

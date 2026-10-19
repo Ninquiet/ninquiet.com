@@ -36,6 +36,7 @@ export class Effects {
   private popups: Popup[] = [];
   shake = 0;
   flash = 0;
+  onExplode: ((x: number, y: number) => void) | null = null;
 
   clear(): void {
     this.particles = [];
@@ -86,6 +87,7 @@ export class Effects {
     this.rings.push({ x, y, life: 0.55, max: 0.55, radius: 110, color: colors[0] });
     this.shake = Math.max(this.shake, 10);
     this.flash = Math.max(this.flash, 0.12);
+    this.onExplode?.(x, y);
   }
 
   confetti(x: number, y: number, colors: string[]): void {

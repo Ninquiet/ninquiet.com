@@ -95,6 +95,40 @@ h1, h2, h3 { font-weight: 500; line-height: 1.15; }
   animation: pixel-spark var(--d) steps(7) forwards;
 }
 
+.card.is-dropping,
+.card.is-dropping:hover {
+  transform-origin: var(--pivot-x, 0%) 0;
+  animation: card-unhook 1.6s forwards !important;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.card.is-gone,
+.card.is-gone:hover {
+  visibility: hidden;
+  animation: none !important;
+  pointer-events: none;
+}
+
+.card.is-rehang {
+  animation: card-rehang 0.65s cubic-bezier(0.3, 1.6, 0.5, 1) both !important;
+}
+
+@keyframes card-unhook {
+  0% { transform: rotate(0deg); }
+  14% { transform: rotate(calc(var(--swing) * 16deg)); }
+  28% { transform: rotate(calc(var(--swing) * 6deg)); }
+  44% { transform: rotate(calc(var(--swing) * 21deg)); }
+  58% { transform: rotate(calc(var(--swing) * 14deg)); }
+  70% { transform: rotate(calc(var(--swing) * 24deg)) translateY(0); opacity: 1; animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  100% { transform: rotate(calc(var(--swing) * 38deg)) translateY(110vh); opacity: 0; }
+}
+
+@keyframes card-rehang {
+  0% { transform: translateY(-46px) scale(0.92); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
 @keyframes pixel-spark {
   0% { transform: translate(0, 0); opacity: 1; }
   70% { opacity: 1; }

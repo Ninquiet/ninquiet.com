@@ -20,7 +20,10 @@ export interface HostileView {
 export interface Hostile {
   readonly body: Body;
   readonly alive: boolean;
+  readonly harmful: boolean;
   readonly dead: boolean;
+  readonly hitRadius: number;
+  hit(effects: Effects, sfx: Sfx): boolean;
   update(context: HostileContext): void;
   draw(ctx: CanvasRenderingContext2D, view: HostileView): void;
   explode(effects: Effects, sfx: Sfx): void;

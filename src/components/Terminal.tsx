@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { LEVEL_EVENT } from '../lib/levelTransition';
 import { applyPalette, isPalette } from '../lib/palette';
 import { complete, execute } from '../lib/terminal/shell';
 import type { Line, ProjectEntry, Segment, TerminalContext } from '../lib/terminal/types';
@@ -36,7 +37,8 @@ export default function Terminal({ projects, intro = 'whoami' }: Props) {
   const ctx = useMemo<TerminalContext>(
     () => ({
       projects,
-      navigate: (href) => window.setTimeout(() => window.location.assign(href), 450),
+      navigate: (href, label) =>
+        window.setTimeout(() => window.dispatchEvent(new CustomEvent(LEVEL_EVENT, { detail: { href, label: label ?? href } })), 300),
       setPalette: (name) => {
         if (!isPalette(name)) return false;
         applyPalette(name);

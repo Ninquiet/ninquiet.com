@@ -14,7 +14,7 @@ export interface ProjectEntry {
 
 export interface TerminalContext {
   projects: ProjectEntry[];
-  navigate: (href: string) => void;
+  navigate: (href: string, label?: string) => void;
   setPalette: (name: string) => boolean;
 }
 

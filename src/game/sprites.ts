@@ -187,6 +187,47 @@ export function droneSprite(propeller: 0 | 1, look: DroneLook, alert: boolean): 
 
 export const DRONE_COLORS = ['#a6ff3c', '#5fae14', '#ff9f1c', '#f2ffe0'];
 
+const SPIDER_ROWS = [
+  '......KKKKKK........',
+  '....KKAAAAAAKK......',
+  '...KAAAAaaAAAAK.....',
+  '..KAAaAAAAAAaAAK....',
+  '.KAAAAAAaaAAAAAKKKK.',
+  '.KAAaAAAAAAAAaAKHHHK',
+  '.KAAAAAaaaaAAAAKHEEK',
+  '.KAAAAAAAAAAAAAKHHEK',
+  '..KAAaAAAAAAaAAKKKK.',
+  '...KAAAAaaAAAAK.....',
+  '....KKAAAAAAKK......',
+  '......KKKKKK........',
+];
+
+export interface SpiderSkin {
+  body: Palette;
+  near: string;
+  far: string;
+  colors: string[];
+}
+
+export const SPIDER_SKINS: SpiderSkin[] = [
+  { body: { K: '#0d0718', A: '#3d1c6e', a: '#7a3cff', H: '#24103f', E: '#5ce1e6' }, near: '#6a36b8', far: '#2a1450', colors: ['#7a3cff', '#3d1c6e', '#5ce1e6'] },
+  { body: { K: '#1f0a02', A: '#c2410c', a: '#ff8a1c', H: '#7c2d12', E: '#fff3b0' }, near: '#ea580c', far: '#7c2d12', colors: ['#ff8a1c', '#c2410c', '#fff3b0'] },
+  { body: { K: '#1f0505', A: '#b91c1c', a: '#ff4d6d', H: '#7f1d1d', E: '#ffffff' }, near: '#ef4444', far: '#7f1d1d', colors: ['#ff4d6d', '#b91c1c', '#ffffff'] },
+];
+
+const SPIDER_FLASH: Palette = { K: '#ffffff', A: '#ffffff', a: '#ffffff', H: '#ffffff', E: '#ffffff' };
+const spiderCache = new Map<string, Sprite>();
+
+export function spiderSprite(stage: number, flash: boolean): Sprite {
+  const key = flash ? 'flash' : String(stage);
+  let sprite = spiderCache.get(key);
+  if (!sprite) {
+    sprite = buildSprite(SPIDER_ROWS, flash ? SPIDER_FLASH : SPIDER_SKINS[stage].body, PIXEL);
+    spiderCache.set(key, sprite);
+  }
+  return sprite;
+}
+
 const STAR_ROWS = [
   '....K....',
   '...KYK...',
