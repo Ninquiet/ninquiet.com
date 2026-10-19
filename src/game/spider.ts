@@ -4,50 +4,91 @@ import type { Point } from './domWorld';
 import type { Effects } from './effects';
 import type { Hostile, HostileContext, HostileView } from './hostile';
 import { drawSprite } from './pixelArt';
-import { createBody, dropThrough, feetY, step, type World } from './physics';
+import { createBody, type World } from './physics';
 import { SPIDER_SKINS, spiderSprite } from './sprites';
-import { distance, type Vec } from './steering';
+import { add, distance, length, normalize, scale, sub, type Vec } from './steering';
 
-type State = 'dormant' | 'waking' | 'chase' | 'crouch' | 'leap' | 'dead';
+type State = 'dormant' | 'waking' | 'crawl' | 'dead';
 
 interface LegSpec {
-  hipX: number;
-  hipY: number;
-  restX: number;
-  near: boolean;
+  angle: number;
   group: 0 | 1;
 }
 
+const DEG = Math.PI / 180;
 const LEGS: LegSpec[] = [
-  { hipX: 14, hipY: 6, restX: 60, near: true, group: 0 },
-  { hipX: 4, hipY: 6, restX: 22, near: true, group: 1 },
-  { hipX: -6, hipY: 6, restX: -34, near: true, group: 0 },
-  { hipX: 12, hipY: 2, restX: 46, near: false, group: 1 },
-  { hipX: 2, hipY: 2, restX: 6, near: false, group: 0 },
-  { hipX: -8, hipY: 2, restX: -50, near: false, group: 1 },
+  { angle: -40 * DEG, group: 0 },
+  { angle: -95 * DEG, group: 1 },
+  { angle: -150 * DEG, group: 0 },
+  { angle: 40 * DEG, group: 1 },
+  { angle: 95 * DEG, group: 0 },
+  { angle: 150 * DEG, group: 1 },
 ];
 
-const LABELS: Record<State, string> = { dormant: 'SLEEP', waking: 'WAKE', chase: 'HUNT', crouch: 'CROUCH', leap: 'LEAP', dead: '' };
+const LABELS: Record<State, string> = { dormant: 'SLEEP', waking: 'WAKE', crawl: 'CRAWL', dead: '' };
+const MAX_REACH = SPIDER.thigh + SPIDER.shin;
 const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 const snap = (v: number) => Math.round(v / PIXEL) * PIXEL;
 const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
+const polar = (angle: number, radius: number): Vec => ({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius });
 
-export function solveKnee(hip: Vec, foot: Vec, thigh: number, shin: number): Vec {
+function lerpAngle(from: number, to: number, k: number): number {
+  const delta = Math.atan2(Math.sin(to - from), Math.cos(to - from));
+  return from + delta * k;
+}
+
+function closestOnPerimeter(r: { x: number; y: number; w: number; h: number }, p: Vec): Vec {
+  const cx = clamp(p.x, r.x, r.x + r.w);
+  const cy = clamp(p.y, r.y, r.y + r.h);
+  if (cx !== p.x || cy !== p.y) return { x: cx, y: cy };
+  const left = p.x - r.x;
+  const right = r.x + r.w - p.x;
+  const top = p.y - r.y;
+  const bottom = r.y + r.h - p.y;
+  const min = Math.min(left, right, top, bottom);
+  if (min === left) return { x: r.x, y: p.y };
+  if (min === right) return { x: r.x + r.w, y: p.y };
+  if (min === top) return { x: p.x, y: r.y };
+  return { x: p.x, y: r.y + r.h };
+}
+
+export function findGrip(world: World, ideal: Vec, hip: Vec): Vec | null {
+  let best: Vec | null = null;
+  let bestDistance = Infinity;
+  const consider = (point: Vec) => {
+    if (distance(hip, point) > MAX_REACH * 0.98) return;
+    const d = distance(point, ideal);
+    if (d < bestDistance) {
+      bestDistance = d;
+      best = point;
+    }
+  };
+  for (const rect of world.rects) consider(closestOnPerimeter(rect, ideal));
+  consider({ x: 0, y: ideal.y });
+  consider({ x: world.width, y: ideal.y });
+  return best;
+}
+
+export function solveKnee(hip: Vec, foot: Vec, body: Vec): Vec {
   const dx = foot.x - hip.x;
   const dy = foot.y - hip.y;
-  const reach = clamp(Math.hypot(dx, dy), Math.abs(thigh - shin) + 0.01, thigh + shin - 0.01);
+  const reach = clamp(Math.hypot(dx, dy), Math.abs(SPIDER.thigh - SPIDER.shin) + 0.01, MAX_REACH - 0.01);
   const base = Math.atan2(dy, dx);
-  const bend = Math.acos(clamp((thigh * thigh + reach * reach - shin * shin) / (2 * thigh * reach), -1, 1));
-  const a = { x: hip.x + Math.cos(base - bend) * thigh, y: hip.y + Math.sin(base - bend) * thigh };
-  const b = { x: hip.x + Math.cos(base + bend) * thigh, y: hip.y + Math.sin(base + bend) * thigh };
-  return a.y < b.y ? a : b;
+  const cos = (SPIDER.thigh ** 2 + reach ** 2 - SPIDER.shin ** 2) / (2 * SPIDER.thigh * reach);
+  const bend = Math.acos(clamp(cos, -1, 1));
+  const a = add(hip, polar(base - bend, SPIDER.thigh));
+  const b = add(hip, polar(base + bend, SPIDER.thigh));
+  return distance(a, body) > distance(b, body) ? a : b;
 }
 
 class Leg {
   foot: Vec = { x: 0, y: 0 };
+  gripped = false;
   private from: Vec = { x: 0, y: 0 };
   private to: Vec = { x: 0, y: 0 };
+  private toGrip = false;
   private t = -1;
+  private lastTry = 0;
 
   constructor(readonly spec: LegSpec) {}
 
@@ -55,49 +96,63 @@ class Leg {
     return this.t >= 0;
   }
 
-  hip(center: Vec, facing: 1 | -1): Vec {
-    return { x: center.x + this.spec.hipX * facing, y: center.y + this.spec.hipY };
+  get planted(): boolean {
+    return !this.stepping && this.gripped;
   }
 
-  startStep(to: Vec): void {
+  hip(center: Vec, heading: number): Vec {
+    return add(center, polar(heading + this.spec.angle, SPIDER.hipRadius));
+  }
+
+  ideal(center: Vec, heading: number, curl: number, velocity: Vec): Vec {
+    return add(add(center, polar(heading + this.spec.angle, SPIDER.idealReach * curl)), scale(velocity, 0.22));
+  }
+
+  canRetry(time: number): boolean {
+    return time - this.lastTry > SPIDER.regrabInterval;
+  }
+
+  reach(to: Vec, grip: boolean, time: number): void {
     this.from = { ...this.foot };
     this.to = to;
+    this.toGrip = grip;
+    this.gripped = false;
+    this.lastTry = time;
     this.t = 0;
   }
 
-  cancel(): void {
-    this.t = -1;
-  }
-
-  advance(dt: number, duration: number): void {
+  advance(dt: number, duration: number, center: Vec): void {
     if (this.t < 0) return;
     this.t = Math.min(1, this.t + dt / duration);
     const k = easeInOut(this.t);
-    this.foot = {
-      x: this.from.x + (this.to.x - this.from.x) * k,
-      y: this.from.y + (this.to.y - this.from.y) * k - Math.sin(Math.PI * this.t) * 14,
-    };
-    if (this.t >= 1) this.t = -1;
+    const along = sub(this.to, this.from);
+    const outward = normalize(sub(add(this.from, scale(along, 0.5)), center));
+    const lift = Math.sin(Math.PI * this.t) * 10;
+    this.foot = add(add(this.from, scale(along, k)), scale(outward, lift));
+    if (this.t >= 1) {
+      this.t = -1;
+      this.gripped = this.toGrip;
+    }
   }
 }
 
 export class Spider implements Hostile {
-  readonly body = createBody(SPIDER.width, SPIDER.height);
+  readonly body = createBody(SPIDER.hitbox, SPIDER.hitbox * 0.72);
   readonly hitRadius = SPIDER.hitRadius;
   private readonly legs = LEGS.map((spec) => new Leg(spec));
+  private position: Vec;
+  private velocity: Vec = { x: 0, y: 0 };
+  private heading = -Math.PI / 2;
   private state: State = 'dormant';
-  private facing: 1 | -1 = -1;
   private hp = SPIDER.hp;
   private time = 0;
   private stateTime = 0;
   private flash = 0;
-  private cooldown = 0;
+  private placed = false;
 
   constructor(x: number, surfaceY: number) {
-    this.body.x = x - this.body.w / 2;
-    this.body.y = surfaceY - this.body.h;
-    const center = this.center();
-    for (const leg of this.legs) leg.foot = { x: center.x + leg.spec.restX * 0.5 * this.facing, y: surfaceY };
+    this.position = { x, y: surfaceY - 10 };
+    this.syncBody();
   }
 
   get alive(): boolean {
@@ -109,7 +164,7 @@ export class Spider implements Hostile {
   }
 
   get harmful(): boolean {
-    return this.state === 'chase' || this.state === 'crouch' || this.state === 'leap';
+    return this.state === 'crawl';
   }
 
   private get stage(): number {
@@ -120,14 +175,8 @@ export class Spider implements Hostile {
     return SPIDER.speedByStage[this.stage];
   }
 
-  private crouchDepth(): number {
-    if (this.state === 'crouch') return Math.min(1, (this.stateTime * this.speedFactor) / SPIDER.crouchTime) * 12;
-    if (this.state === 'dormant') return 8 + Math.sin(this.time * 2) * 1.5;
-    return 0;
-  }
-
   center(): Point {
-    return { x: this.body.x + this.body.w / 2, y: this.body.y + this.body.h - SPIDER.ride + this.crouchDepth() };
+    return { ...this.position };
   }
 
   private setState(state: State): void {
@@ -135,157 +184,130 @@ export class Spider implements Hostile {
     this.stateTime = 0;
   }
 
+  private curl(): number {
+    if (this.state === 'dormant') return 0.55 + Math.sin(this.time * 2) * 0.03;
+    if (this.state === 'waking') return 0.55 + 0.45 * Math.min(1, this.stateTime / SPIDER.wakeTime);
+    return 1;
+  }
+
+  private grip(): number {
+    return this.legs.filter((leg) => leg.planted).length;
+  }
+
   update(c: HostileContext): void {
     this.time += c.dt;
     this.stateTime += c.dt;
     this.flash = Math.max(0, this.flash - c.dt);
-    this.cooldown = Math.max(0, this.cooldown - c.dt);
     if (this.state === 'dead') return;
+    if (!this.placed) this.placeLegs(c.world);
 
-    const body = this.body;
-    const me = this.center();
-    const target = c.target;
-    const targetCenter = target ? { x: target.x + target.w / 2, y: target.y + target.h / 2 } : null;
-
-    if (this.state === 'dormant') {
-      body.vx = 0;
-      if (targetCenter && distance(me, targetCenter) < SPIDER.wakeRadius) this.wake(c);
-    } else if (this.state === 'waking') {
-      if (targetCenter) this.facing = targetCenter.x > me.x ? 1 : -1;
-      if (this.stateTime >= SPIDER.wakeTime) this.setState('chase');
-    } else if (this.state === 'chase' && target && targetCenter) {
-      this.chase(c, me, target.y + target.h, targetCenter);
-    } else if (this.state === 'crouch' && target && targetCenter) {
-      body.vx *= 0.8;
-      if (this.stateTime >= SPIDER.crouchTime / this.speedFactor) this.leap(c, me, targetCenter.x, feetY(target));
+    const target = c.target ? { x: c.target.x + c.target.w / 2, y: c.target.y + c.target.h / 2 } : null;
+    if (this.state === 'dormant' && target && distance(this.position, target) < SPIDER.wakeRadius) this.wake(c);
+    if (this.state === 'waking') {
+      if (target) this.heading = lerpAngle(this.heading, Math.atan2(target.y - this.position.y, target.x - this.position.x), Math.min(1, c.dt * 4));
+      if (this.stateTime >= SPIDER.wakeTime) this.setState('crawl');
     }
+    if (this.state === 'crawl') this.crawl(c, target);
 
-    const landed = step(body, c.dt, c.world, SPIDER.gravity, SPIDER.maxFall);
-    if (this.state === 'leap' && landed) {
-      this.setState('chase');
-      this.cooldown = SPIDER.leapCooldown / this.speedFactor;
-      c.effects.dust(me.x, feetY(body), 1.6);
-      c.effects.shake = Math.max(c.effects.shake, 5);
-      this.plantAll(c.world);
+    this.updateLegs(c);
+    this.syncBody();
+  }
+
+  private placeLegs(world: World): void {
+    this.placed = true;
+    for (const leg of this.legs) {
+      const ideal = leg.ideal(this.position, this.heading, this.curl(), this.velocity);
+      const grip = findGrip(world, ideal, leg.hip(this.position, this.heading));
+      leg.foot = grip ?? ideal;
+      leg.gripped = grip !== null;
     }
-    this.updateLegs(c.dt, c.world);
   }
 
   private wake(c: HostileContext): void {
     this.setState('waking');
-    const me = this.center();
-    c.effects.popup('!!', me.x, me.y - 40, '#ff2244');
+    c.effects.popup('!!', this.position.x, this.position.y - 44, '#ff2244');
     c.sfx.alert();
   }
 
-  private chase(c: HostileContext, me: Vec, targetFeet: number, targetCenter: Vec): void {
-    const body = this.body;
-    const dx = targetCenter.x - me.x;
-    if (Math.abs(dx) > 12) this.facing = dx > 0 ? 1 : -1;
-
-    const planted = this.legs.filter((leg) => !leg.stepping).length;
-    let gait = 0.35 + 0.65 * (planted / this.legs.length);
-    const overreached = this.legs.some((leg) => !leg.stepping && distance(leg.hip(me, this.facing), leg.foot) > SPIDER.thigh + SPIDER.shin);
-    if (overreached) gait *= 0.3;
-
-    const desired = Math.abs(dx) > 16 ? Math.sign(dx) * SPIDER.speed * this.speedFactor * gait : 0;
-    const delta = desired - body.vx;
-    body.vx += Math.sign(delta) * Math.min(Math.abs(delta), SPIDER.accel * c.dt);
-
-    const dy = targetFeet - feetY(body);
-    const ground = body.ground;
-    if (dy > 60 && body.onGround && ground && !ground.floor && Math.abs(dx) < 140) {
-      dropThrough(body, 0.3);
-      return;
-    }
-    const atEdge = !!ground && !ground.floor && ((dx < 0 && me.x - ground.x < 20) || (dx > 0 && ground.x + ground.w - me.x < 20));
-    const inRange = distance(me, targetCenter) < SPIDER.leapRange;
-    if (body.onGround && this.cooldown === 0 && inRange && (dy < -70 || (atEdge && Math.abs(dy) < 120))) this.setState('crouch');
-  }
-
-  private leap(c: HostileContext, me: Vec, targetX: number, targetFeet: number): void {
-    const t = SPIDER.leapTime;
-    const dy = targetFeet - feetY(this.body);
-    this.body.vx = clamp((targetX - me.x) / t, -650, 650);
-    this.body.vy = clamp((dy - 0.5 * SPIDER.gravity * t * t) / t, -1350, 250);
-    this.setState('leap');
-    for (const leg of this.legs) leg.cancel();
-    c.effects.dust(me.x, feetY(this.body), 1.2);
-    c.sfx.jump();
-  }
-
-  private surfaceAt(x: number, world: World, nearY: number): number {
-    let best = nearY;
-    let bestGap = Infinity;
-    for (const p of world.platforms) {
-      if (x < p.x || x > p.x + p.w) continue;
-      const gap = Math.abs(p.y - nearY);
-      if (p.y > nearY - 50 && p.y < nearY + 90 && gap < bestGap) {
-        bestGap = gap;
-        best = p.y;
-      }
-    }
-    return best;
-  }
-
-  private restTarget(leg: Leg, world: World, curl: number): Vec {
-    const me = this.center();
-    const x = me.x + leg.spec.restX * this.facing * curl + this.body.vx * 0.18;
-    const y = this.surfaceAt(x, world, feetY(this.body)) - (leg.spec.near ? 0 : 3);
-    return { x, y };
-  }
-
-  private plantAll(world: World): void {
-    for (const leg of this.legs) {
-      leg.cancel();
-      leg.foot = this.restTarget(leg, world, 1);
-    }
-  }
-
-  private updateLegs(dt: number, world: World): void {
-    const me = this.center();
-    const airborne = this.state === 'leap' || !this.body.onGround;
-    if (airborne) {
-      for (const leg of this.legs) {
-        const hip = leg.hip(me, this.facing);
-        const tuck = { x: hip.x + leg.spec.restX * 0.4 * this.facing, y: hip.y + 26 };
-        leg.foot = { x: leg.foot.x + (tuck.x - leg.foot.x) * Math.min(1, dt * 14), y: leg.foot.y + (tuck.y - leg.foot.y) * Math.min(1, dt * 14) };
-      }
-      return;
+  private crawl(c: HostileContext, target: Vec | null): void {
+    const grip = this.grip();
+    const holding = grip >= SPIDER.minGrip;
+    if (holding && target) {
+      const toTarget = sub(target, this.position);
+      const lunge = length(toTarget) < SPIDER.lungeRadius ? SPIDER.lungeBoost : 1;
+      const traction = 0.3 + 0.7 * (grip / this.legs.length);
+      const desired = scale(normalize(toTarget), SPIDER.speed * this.speedFactor * traction * lunge);
+      const steer = sub(desired, this.velocity);
+      const maxStep = SPIDER.accel * this.speedFactor * c.dt;
+      const steerLength = length(steer);
+      this.velocity = add(this.velocity, steerLength > maxStep ? scale(steer, maxStep / steerLength) : steer);
+    } else if (!holding) {
+      this.velocity = { x: this.velocity.x * 0.98, y: this.velocity.y + SPIDER.fallGravity * c.dt };
     }
 
-    const curl = this.state === 'dormant' ? 0.5 : this.state === 'waking' ? 0.5 + 0.5 * Math.min(1, this.stateTime / SPIDER.wakeTime) : 1;
+    const overreached = this.legs.some((leg) => leg.planted && distance(leg.hip(this.position, this.heading), leg.foot) > MAX_REACH);
+    if (overreached && holding) this.velocity = scale(this.velocity, 0.55);
+
+    this.position = add(this.position, scale(this.velocity, c.dt));
+    this.position.x = clamp(this.position.x, 30, c.world.width - 30);
+    this.position.y = clamp(this.position.y, 40, c.world.bottom - 30);
+    if (this.position.y >= c.world.bottom - 30) this.velocity.y = Math.min(0, this.velocity.y);
+    if (length(this.velocity) > 25) this.heading = lerpAngle(this.heading, Math.atan2(this.velocity.y, this.velocity.x), Math.min(1, c.dt * 6));
+  }
+
+  private updateLegs(c: HostileContext): void {
+    const curl = this.curl();
+    const falling = this.grip() < SPIDER.minGrip && this.state === 'crawl';
     const stepTime = SPIDER.stepTime / this.speedFactor;
     for (const leg of this.legs) {
-      const target = this.restTarget(leg, world, curl);
-      const otherGroupStepping = this.legs.some((other) => other.stepping && other.spec.group !== leg.spec.group);
-      const threshold = this.state === 'waking' ? 6 : SPIDER.stepThreshold;
-      if (!leg.stepping && !otherGroupStepping && distance(leg.foot, target) > threshold) leg.startStep(target);
-      leg.advance(dt, stepTime);
+      const hip = leg.hip(this.position, this.heading);
+      const ideal = leg.ideal(this.position, this.heading, curl, this.velocity);
+      if (!leg.stepping) {
+        const otherGroupStepping = this.legs.some((other) => other.stepping && other.spec.group !== leg.spec.group);
+        const drifted = distance(leg.foot, ideal) > (this.state === 'waking' ? 8 : SPIDER.stepThreshold);
+        const overreached = distance(hip, leg.foot) > MAX_REACH;
+        const loose = !leg.gripped && leg.canRetry(this.time);
+        if ((drifted || overreached || loose) && (falling || !otherGroupStepping)) {
+          const grip = findGrip(c.world, ideal, hip);
+          leg.reach(grip ?? ideal, grip !== null, this.time);
+        }
+      }
+      leg.advance(c.dt, stepTime, this.position);
+      if (!leg.stepping && !leg.gripped && distance(hip, leg.foot) > MAX_REACH) {
+        const dir = normalize(sub(leg.foot, hip));
+        leg.foot = add(hip, scale(dir, MAX_REACH));
+      }
     }
+  }
+
+  private syncBody(): void {
+    this.body.x = this.position.x - this.body.w / 2;
+    this.body.y = this.position.y - this.body.h / 2;
+    this.body.vx = this.velocity.x;
+    this.body.vy = this.velocity.y;
   }
 
   hit(effects: Effects, sfx: Sfx): boolean {
     if (this.state === 'dead') return true;
     this.hp -= 1;
-    const me = this.center();
     if (this.hp <= 0) {
       this.explode(effects, sfx);
       return true;
     }
+    const me = this.position;
     this.flash = 0.18;
     effects.sparkle(me.x, me.y, SPIDER_SKINS[this.stage].colors);
-    effects.popup(this.hp === 1 ? '1 HIT LEFT!' : `${this.hp} HITS LEFT`, me.x, me.y - 46, SPIDER_SKINS[this.stage].colors[0]);
+    effects.popup(this.hp === 1 ? '1 HIT LEFT!' : `${this.hp} HITS LEFT`, me.x, me.y - 50, SPIDER_SKINS[this.stage].colors[0]);
     effects.shake = Math.max(effects.shake, 6);
     sfx.stomp();
     if (this.state === 'dormant') this.setState('waking');
-    this.body.vx -= this.facing * 160;
+    this.velocity = add(this.velocity, scale(normalize({ x: -Math.cos(this.heading), y: -Math.sin(this.heading) }), 220));
     return false;
   }
 
   explode(effects: Effects, sfx: Sfx): void {
     if (this.state === 'dead') return;
-    const me = this.center();
+    const me = this.position;
     const colors = SPIDER_SKINS[this.stage].colors;
     this.state = 'dead';
     effects.explode(me.x, me.y, colors);
@@ -297,22 +319,25 @@ export class Spider implements Hostile {
 
   draw(ctx: CanvasRenderingContext2D, view: HostileView): void {
     if (this.state === 'dead') return;
-    const me = this.center();
+    const me = this.position;
     const skin = SPIDER_SKINS[this.stage];
     const flashing = this.flash > 0;
-    for (const leg of this.legs) if (!leg.spec.near) this.drawLeg(ctx, leg, me, flashing ? '#ffffff' : skin.far, 4);
+    for (const leg of this.legs) this.drawLeg(ctx, leg, flashing ? '#ffffff' : leg.spec.group === 0 ? skin.near : skin.far);
     const sprite = spiderSprite(this.stage, flashing);
+    const facingRight = Math.cos(this.heading) >= 0;
     const jitter = this.stage === 2 && Math.floor(this.time * 20) % 4 === 0 ? 2 : 0;
-    drawSprite(ctx, sprite, me.x + jitter, me.y + sprite.height / 2, { facing: this.facing });
-    for (const leg of this.legs) if (leg.spec.near) this.drawLeg(ctx, leg, me, flashing ? '#ffffff' : skin.near, 5);
-    this.drawLabel(ctx, me, view.accent);
+    drawSprite(ctx, sprite, me.x + jitter, me.y + sprite.height / 2, {
+      facing: facingRight ? 1 : -1,
+      rotation: facingRight ? this.heading : this.heading - Math.PI,
+    });
+    this.drawLabel(ctx, view.accent);
   }
 
-  private drawLeg(ctx: CanvasRenderingContext2D, leg: Leg, center: Vec, color: string, width: number): void {
-    const hip = leg.hip(center, this.facing);
-    const knee = solveKnee(hip, leg.foot, SPIDER.thigh, SPIDER.shin);
+  private drawLeg(ctx: CanvasRenderingContext2D, leg: Leg, color: string): void {
+    const hip = leg.hip(this.position, this.heading);
+    const knee = solveKnee(hip, leg.foot, this.position);
     ctx.strokeStyle = color;
-    ctx.lineWidth = width;
+    ctx.lineWidth = 5;
     ctx.lineCap = 'square';
     ctx.lineJoin = 'miter';
     ctx.beginPath();
@@ -324,16 +349,18 @@ export class Spider implements Hostile {
     ctx.fillRect(snap(knee.x) - 4, snap(knee.y) - 4, 8, 8);
     ctx.fillStyle = '#0d0718';
     ctx.fillRect(snap(knee.x) - 1, snap(knee.y) - 1, 3, 3);
-    ctx.fillRect(snap(leg.foot.x) - 2, snap(leg.foot.y) - 1, 4, 3);
+    ctx.fillStyle = leg.gripped ? '#ffffff' : '#0d0718';
+    ctx.fillRect(snap(leg.foot.x) - 2, snap(leg.foot.y) - 2, 4, 4);
   }
 
-  private drawLabel(ctx: CanvasRenderingContext2D, me: Vec, accent: string): void {
-    const top = me.y - 34;
+  private drawLabel(ctx: CanvasRenderingContext2D, accent: string): void {
+    const me = this.position;
+    const top = me.y - 58;
     ctx.font = '7px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
     ctx.fillStyle = this.harmful ? '#ff2244' : accent;
     ctx.globalAlpha = 0.9;
-    ctx.fillText(`AI:${LABELS[this.state]}`, me.x, top);
+    ctx.fillText(`AI:${LABELS[this.state]} GRIP ${this.grip()}/6`, me.x, top);
     for (let i = 0; i < SPIDER.hp; i++) {
       ctx.fillStyle = i < this.hp ? SPIDER_SKINS[this.stage].colors[0] : 'rgba(255,255,255,0.18)';
       ctx.fillRect(me.x - 17 + i * 12, top + 5, 9, 5);

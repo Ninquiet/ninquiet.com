@@ -1,7 +1,7 @@
 import { AmbientDrones } from './ambient';
 import { Sfx } from './audio';
 import { CityBackground } from './cityBackground';
-import { DRONE, ENEMY, HEADER_SELECTOR, SPIDER, STAR_SIZE, ZAP_RADIUS } from './constants';
+import { CHAIN_DELAY, CHAIN_RADIUS, DRONE, ENEMY, HEADER_SELECTOR, SPIDER, STAR_SIZE, ZAP_RADIUS } from './constants';
 import { DomWorld, type Point } from './domWorld';
 import { Effects } from './effects';
 import { Drone } from './drone';
@@ -54,6 +54,11 @@ export class Game {
   private readonly cardDrop = new CardDrop();
   private droneRespawns: number[] = [];
   private suppressClick = false;
+  private time = 0;
+  private prevFeet = 0;
+  private chain: { hostile: Hostile; at: number }[] = [];
+  private combo = 0;
+  private comboTimer = 0;
   private stars: Star[] = [];
   private phase: Phase = 'idle';
   private result: Result = 'lose';
@@ -87,6 +92,7 @@ export class Game {
     this.effects.onExplode = (x, y) => {
       this.cardDrop.near(x, y, 120);
       this.world.refresh();
+      this.queueChain(x, y);
     };
   }
 
@@ -305,6 +311,8 @@ export class Game {
   };
 
   private update(dt: number): void {
+    this.time += dt;
+    this.prevFeet = feetY(this.player.body);
     this.effects.update(dt);
     this.refreshTimer -= dt;
     if (this.refreshTimer <= 0 && this.phase !== 'idle') {
@@ -327,9 +335,42 @@ export class Game {
     else if (this.phase === 'over') this.updateOver(dt);
     else if (this.phase === 'returning' && done) {
       this.hostiles = [];
+      this.chain = [];
       this.cardDrop.restoreAll();
       this.stars = [];
       this.setPhase('idle');
+    }
+    this.processChain(dt);
+  }
+
+  private chainTargets(): Hostile[] {
+    if (this.phase === 'idle') return this.ambient.drones;
+    if (this.phase === 'playing' || this.phase === 'over') return this.hostiles;
+    return [];
+  }
+
+  private queueChain(x: number, y: number): void {
+    for (const hostile of this.chainTargets()) {
+      if (!hostile.alive || this.chain.some((entry) => entry.hostile === hostile)) continue;
+      if (distance(hostile.center(), { x, y }) > CHAIN_RADIUS + hostile.hitRadius * 0.5) continue;
+      this.chain.push({ hostile, at: this.time + CHAIN_DELAY });
+    }
+  }
+
+  private processChain(dt: number): void {
+    this.comboTimer = Math.max(0, this.comboTimer - dt);
+    if (this.comboTimer === 0) this.combo = 0;
+    if (this.chain.length === 0) return;
+    const due = this.chain.filter((entry) => entry.at <= this.time);
+    this.chain = this.chain.filter((entry) => entry.at > this.time);
+    for (const { hostile } of due) {
+      if (!hostile.alive) continue;
+      const c = hostile.center();
+      const destroyed = hostile.hit(this.effects, this.sfx);
+      this.combo += 1;
+      this.comboTimer = 0.9;
+      this.effects.popup(`CHAIN x${this.combo + 1}`, c.x, c.y - 40, '#ffd84a');
+      if (destroyed && this.phase === 'playing') this.onHostileKilled(hostile);
     }
   }
 
@@ -390,16 +431,23 @@ export class Game {
     const context = this.hostileContext(dt, true);
     for (const hostile of this.hostiles) {
       hostile.update(context);
-      if (!hostile.harmful || !overlaps(body, hostile.body, 4)) continue;
-      const stomping = body.vy > 120 && feetY(body) - hostile.body.y < 22;
-      if (stomping) {
+      if (!hostile.harmful) continue;
+      const enemy = hostile.body;
+      const feet = feetY(body);
+      const horizontal = body.x + 3 < enemy.x + enemy.w && body.x + body.w - 3 > enemy.x;
+      const cameFromAbove = this.prevFeet <= enemy.y + 16 || body.y + body.h / 2 < enemy.y;
+      const stomping = horizontal && body.vy >= -40 && cameFromAbove && feet >= enemy.y - 3;
+      if (stomping && this.player.grace === 0) {
         const destroyed = hostile.hit(this.effects, this.sfx);
         this.player.stomp();
         this.sfx.stomp();
         vibrate(25);
-        this.effects.popup('STOMP!', centerX(hostile.body), hostile.body.y - 10, this.accents.acc);
+        this.effects.popup('STOMP!', centerX(enemy), enemy.y - 10, this.accents.acc);
         if (destroyed) this.onHostileKilled(hostile);
-      } else if (this.player.invulnerable === 0) {
+        continue;
+      }
+      if (stomping || this.player.grace > 0 || this.player.invulnerable > 0) continue;
+      if (overlaps(body, enemy, 6)) {
         this.finish('lose');
         return;
       }

@@ -20,6 +20,7 @@ export interface Body {
 
 export interface World {
   platforms: Platform[];
+  rects: { x: number; y: number; w: number; h: number }[];
   width: number;
   bottom: number;
 }

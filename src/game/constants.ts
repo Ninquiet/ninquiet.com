@@ -58,6 +58,9 @@ export const PLATFORM_SELECTORS = [
   'body > footer',
 ];
 
+export const GRAB_SELECTORS = [...PLATFORM_SELECTORS, 'main p', 'main h1', 'main h2', 'main li', 'main img', 'main video'];
+export const GRAB_LINE_SELECTOR = 'main .section';
+
 export const STAR_SELECTOR = 'main .card, main #contact .chips .tag';
 export const PERCH_SELECTOR = '[data-bitdroid-perch]';
 export const HEADER_SELECTOR = 'body > header';
@@ -86,27 +89,28 @@ export const DRONE = {
 };
 
 export const ZAP_RADIUS = 34;
+export const CHAIN_RADIUS = 115;
+export const CHAIN_DELAY = 0.12;
 
 export const SPIDER = {
-  width: 60,
-  height: 58,
-  ride: 44,
-  speed: 125,
-  accel: 900,
-  gravity: 2300,
-  maxFall: 1150,
+  hitbox: 60,
+  speed: 145,
+  accel: 700,
+  fallGravity: 1500,
   wakeRadius: 380,
-  wakeTime: 0.75,
-  crouchTime: 0.34,
-  leapTime: 0.72,
-  leapRange: 560,
-  leapCooldown: 1.6,
-  thigh: 34,
-  shin: 40,
+  wakeTime: 0.8,
+  lungeRadius: 150,
+  lungeBoost: 1.7,
+  thigh: 36,
+  shin: 42,
+  hipRadius: 12,
+  idealReach: 54,
   stepThreshold: 30,
   stepTime: 0.15,
+  regrabInterval: 0.25,
+  minGrip: 2,
   hp: 3,
   speedByStage: [1, 1.4, 1.85],
   hitRadius: 50,
   perchSelector: 'main #contact .cta',
-};
+}

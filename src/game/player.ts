@@ -26,6 +26,7 @@ export class Player {
   readonly body = createBody(PLAYER.width, PLAYER.height);
   facing: 1 | -1 = 1;
   invulnerable = 0;
+  grace = 0;
   hovered = false;
   private mode: Mode = 'idle';
   private time = 0;
@@ -101,6 +102,7 @@ export class Player {
   }
 
   stomp(): void {
+    this.grace = 0.28;
     this.body.vy = -PLAYER.stompBounce;
     this.jumpsUsed = 1;
     this.stretch();
@@ -109,6 +111,7 @@ export class Player {
   update(dt: number, ctx: { input: Input; world: World; effects: Effects; sfx: Sfx; perch: Point | null; pointer: Point | null }): boolean {
     this.time += dt;
     this.invulnerable = Math.max(0, this.invulnerable - dt);
+    this.grace = Math.max(0, this.grace - dt);
     this.updateSway(dt);
     this.squashX += (1 - this.squashX) * Math.min(1, dt * 14);
     this.squashY += (1 - this.squashY) * Math.min(1, dt * 14);

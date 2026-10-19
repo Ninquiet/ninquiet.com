@@ -1,10 +1,17 @@
 import { FALLEN_SELECTOR } from '../lib/cardDrop';
-import { PERCH_SELECTOR, PLATFORM_SELECTORS, STAR_SELECTOR } from './constants';
+import { GRAB_LINE_SELECTOR, GRAB_SELECTORS, PERCH_SELECTOR, PLATFORM_SELECTORS, STAR_SELECTOR } from './constants';
 import type { Platform, World } from './physics';
 
 export interface Point {
   x: number;
   y: number;
+}
+
+export interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }
 
 export interface Zone {
@@ -22,6 +29,7 @@ function documentRect(el: Element) {
 
 export class DomWorld implements World {
   platforms: Platform[] = [];
+  rects: Rect[] = [];
   width = 0;
   bottom = 0;
   private starAnchors: Element[] = [];
@@ -31,12 +39,22 @@ export class DomWorld implements World {
     this.width = doc.clientWidth;
     this.bottom = doc.scrollHeight;
     this.platforms = [];
+    this.rects = [];
     for (const el of document.querySelectorAll(PLATFORM_SELECTORS.join(','))) {
       if ((el as HTMLElement).offsetParent === null && el.tagName !== 'FOOTER') continue;
       if (el.closest(FALLEN_SELECTOR)) continue;
       const rect = documentRect(el);
       if (rect.w < 8 || rect.h <= 0) continue;
       this.platforms.push({ x: rect.x, y: Math.round(rect.y + rect.h * insetOf(el)), w: rect.w });
+    }
+    for (const el of document.querySelectorAll(GRAB_SELECTORS.join(','))) {
+      if ((el as HTMLElement).offsetParent === null || el.closest(FALLEN_SELECTOR)) continue;
+      const rect = documentRect(el);
+      if (rect.w >= 8 && rect.h > 0) this.rects.push(rect);
+    }
+    for (const el of document.querySelectorAll(GRAB_LINE_SELECTOR)) {
+      const rect = documentRect(el);
+      this.rects.push({ x: 0, y: rect.y, w: this.width, h: 1 });
     }
     this.starAnchors = [...document.querySelectorAll(STAR_SELECTOR)].filter((el) => (el as HTMLElement).offsetParent !== null);
   }
