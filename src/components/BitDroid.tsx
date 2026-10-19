@@ -1,15 +1,9 @@
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Game, type Phase } from '../game/game';
 import type { Action } from '../game/input';
 import { PALETTE_EVENT, readAccents } from '../lib/palette';
 import styles from './BitDroid.module.css';
-
-const TOUCH_BUTTONS: { action: Action; label: string; side: 'left' | 'right' }[] = [
-  { action: 'left', label: '◀', side: 'left' },
-  { action: 'right', label: '▶', side: 'left' },
-  { action: 'down', label: '▼', side: 'right' },
-  { action: 'jump', label: '▲', side: 'right' },
-];
+import TouchPad from './TouchPad.tsx';
 
 export default function BitDroid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -38,11 +32,6 @@ export default function BitDroid() {
     };
   }, []);
 
-  const press = (action: Action, pressed: boolean) => (event: PointerEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    gameRef.current?.controls.setVirtual(action, pressed);
-  };
-
   return (
     <>
       <canvas ref={backgroundRef} className={styles.city} aria-hidden="true" />
@@ -55,26 +44,11 @@ export default function BitDroid() {
         onClick={() => gameRef.current?.start()}
       />
       {touch && phase === 'playing' && (
-        <div className={styles.pad}>
-          {(['left', 'right'] as const).map((side) => (
-            <div key={side} className={styles.cluster}>
-              {TOUCH_BUTTONS.filter((b) => b.side === side).map((b) => (
-                <button
-                  key={b.action}
-                  type="button"
-                  className={styles.key}
-                  aria-label={b.action}
-                  onPointerDown={press(b.action, true)}
-                  onPointerUp={press(b.action, false)}
-                  onPointerCancel={press(b.action, false)}
-                  onPointerLeave={press(b.action, false)}
-                >
-                  {b.label}
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
+        <TouchPad
+          onAction={(action: Action, pressed: boolean) => gameRef.current?.controls.setVirtual(action, pressed)}
+          onQuit={() => gameRef.current?.quit()}
+          onToggleMute={() => gameRef.current?.toggleMute() ?? false}
+        />
       )}
     </>
   );

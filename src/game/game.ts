@@ -30,6 +30,8 @@ export interface GameOptions {
 }
 
 const BUBBLES = ['click me!', 'wanna play?', 'psst... press me', 'stars to collect!', 'beep boop'];
+const TOUCH_BUBBLES = ['tap me!', 'wanna play?', 'tap to play', 'beep boop'];
+const vibrate = (pattern: number | number[]) => navigator.vibrate?.(pattern);
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 
 export class Game {
@@ -54,7 +56,7 @@ export class Game {
   private refreshTimer = 0;
   private bubbleText = '';
   private bubbleTime = 0;
-  private bubbleTimer = 5;
+  private bubbleTimer = 2.5;
   private pointerClient: { x: number; y: number } | null = null;
   private accents: Accents;
   private width = 0;
@@ -131,13 +133,19 @@ export class Game {
     this.setPhase('playing');
   }
 
-  private quit(): void {
+  quit(): void {
     if (this.phase !== 'playing') return;
     this.finish('quit');
   }
 
+  toggleMute(): boolean {
+    return this.sfx.toggleMute();
+  }
+
   private setPhase(phase: Phase): void {
     this.phase = phase;
+    if (phase === 'idle') delete document.documentElement.dataset.game;
+    else document.documentElement.dataset.game = phase;
     if (phase === 'playing') this.city.show();
     if (phase === 'returning' || phase === 'idle') this.city.hide();
     this.options.hitbox.hidden = phase !== 'idle';
@@ -152,6 +160,7 @@ export class Game {
     if (result === 'lose') {
       this.player.hurt();
       this.sfx.lose();
+      vibrate([60, 40, 160]);
       this.effects.flash = 0.2;
       this.effects.shake = 12;
     } else if (result === 'win') {
@@ -251,9 +260,10 @@ export class Game {
     this.bubbleTime = Math.max(0, this.bubbleTime - dt);
     this.bubbleTimer -= dt;
     if (this.bubbleTimer <= 0) {
-      this.bubbleText = BUBBLES[Math.floor(Math.random() * BUBBLES.length)];
+      const pool = this.options.touch ? TOUCH_BUBBLES : BUBBLES;
+      this.bubbleText = pool[Math.floor(Math.random() * pool.length)];
       this.bubbleTime = 2.6;
-      this.bubbleTimer = rand(10, 16);
+      this.bubbleTimer = this.options.touch ? rand(5, 8) : rand(10, 16);
     }
   }
 
@@ -289,6 +299,7 @@ export class Game {
         enemy.explode(this.effects, this.sfx);
         this.player.stomp();
         this.sfx.stomp();
+        vibrate(25);
         this.effects.popup('STOMP!', centerX(enemy.body), enemy.body.y - 10, this.accents.acc);
         this.respawns.push(this.spawnClock + ENEMY.respawnDelay);
       } else if (this.player.invulnerable === 0) {
@@ -307,6 +318,7 @@ export class Game {
       this.effects.sparkle(star.x, star.y, STAR_COLORS);
       this.effects.popup('+1', star.x, star.y - 18, '#ffd84a');
       this.sfx.collect();
+      vibrate(12);
     }
     if (this.stars.length > 0 && this.stars.every((star) => star.taken)) this.finish('win');
 
@@ -384,7 +396,7 @@ export class Game {
     }
     if (this.phase === 'playing' || this.phase === 'over') {
       const taken = this.stars.filter((s) => s.taken).length;
-      drawHud(ctx, header, { taken, total: this.stars.length }, this.elapsed, this.sfx.muted, this.accents);
+      drawHud(ctx, header, { taken, total: this.stars.length }, this.elapsed, this.sfx.muted, this.accents, this.options.touch);
     }
     if (this.phase === 'playing') drawHint(ctx, this.width, this.height, this.hintTimer, this.options.touch, this.accents);
     if (this.phase === 'over' && this.result !== 'quit') {

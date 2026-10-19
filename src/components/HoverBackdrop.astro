@@ -1,0 +1,57 @@
+<div class="hover-backdrop" id="hover-backdrop" aria-hidden="true">
+  <div class="layer" data-backdrop-layer></div>
+  <div class="layer" data-backdrop-layer></div>
+  <div class="vignette"></div>
+</div>
+
+<script>
+  import { HoverBackdrop } from '../lib/hoverBackdrop';
+
+  const root = document.getElementById('hover-backdrop');
+  if (root) new HoverBackdrop(root).attach();
+</script>
+
+<style>
+  .hover-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .layer {
+    position: absolute;
+    inset: -80px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(16px) saturate(1.2);
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .layer:global(.is-in) { animation: backdrop-jump 760ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
+  .layer:global(.is-out) { animation: backdrop-fall 380ms ease-in forwards; }
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, transparent 30%, color-mix(in srgb, var(--bg) 70%, transparent) 62%, var(--bg) 92%),
+      linear-gradient(to bottom, var(--bg), transparent 18%, transparent 82%, var(--bg));
+    opacity: 0;
+    transition: opacity 420ms ease;
+  }
+  .is-active .vignette { opacity: 1; }
+
+  @keyframes backdrop-jump {
+    0% { opacity: 0; transform: translateY(90px) scale(1.06, 0.94); }
+    18% { opacity: 0.28; transform: translateY(70px) scale(1.08, 0.9); }
+    48% { opacity: 0.6; transform: translateY(-22px) scale(0.97, 1.04); }
+    66% { transform: translateY(6px) scale(1.04, 0.96); }
+    82% { transform: translateY(-4px) scale(0.99, 1.01); }
+    100% { opacity: 0.52; transform: translateY(0) scale(1, 1); }
+  }
+
+  @keyframes backdrop-fall {
+    from { opacity: 0.52; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(40px); }
+  }
+</style>

@@ -1,0 +1,85 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: none;
+  font-family: 'Press Start 2P', monospace;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.system {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 120px);
+  right: 16px;
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.pad {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 18px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-inline: 18px;
+}
+
+.cluster {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+
+.key,
+.small {
+  --px: 4px;
+  color: var(--txt);
+  background: rgb(8 10 18 / 0.78);
+  border: 0;
+  border-radius: 0;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--acc),
+    0 var(--px) 0 0 var(--acc),
+    calc(var(--px) * -1) 0 0 0 var(--acc),
+    var(--px) 0 0 0 var(--acc),
+    0 calc(var(--px) * 2) 0 0 color-mix(in srgb, var(--acc) 40%, #000);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.key {
+  width: 66px;
+  height: 66px;
+  font-size: 20px;
+}
+
+.jump {
+  width: 92px;
+  height: 92px;
+  font-size: 12px;
+  --acc: var(--acc2);
+}
+
+.small {
+  --px: 3px;
+  padding: 8px 10px;
+  font-size: 8px;
+}
+
+.key[data-pressed],
+.key:active {
+  background: var(--acc);
+  color: var(--bg);
+  transform: translateY(var(--px));
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--acc),
+    0 var(--px) 0 0 var(--acc),
+    calc(var(--px) * -1) 0 0 0 var(--acc),
+    var(--px) 0 0 0 var(--acc);
+}

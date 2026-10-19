@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { PROFILE } from '../data/profile';
 import PaletteSwitcher from '../components/PaletteSwitcher.tsx';
 import ScrollGlitch from '../components/ScrollGlitch.astro';
+import HoverBackdrop from '../components/HoverBackdrop.astro';
 
 interface Props {
   title?: string;
@@ -70,6 +71,7 @@ const nav = [
         <PaletteSwitcher client:idle />
       </div>
     </footer>
+    <HoverBackdrop />
     <ScrollGlitch />
     <script>
       import { initAutoplayVideos } from '../lib/autoplayVideos';

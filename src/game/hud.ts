@@ -21,16 +21,17 @@ function panel(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h
   ctx.fillRect(x + w - 3, y, 3, h);
 }
 
-export function drawHud(ctx: CanvasRenderingContext2D, top: number, stars: { taken: number; total: number }, elapsed: number, muted: boolean, accents: Accents): void {
+export function drawHud(ctx: CanvasRenderingContext2D, top: number, stars: { taken: number; total: number }, elapsed: number, muted: boolean, accents: Accents, touch = false): void {
   const x = 16;
   const y = top + 14;
-  panel(ctx, x, y, 236, 58, accents.acc);
+  panel(ctx, x, y, 236, touch ? 40 : 58, accents.acc);
   ctx.font = `12px ${PIXEL_FONT}`;
   ctx.textAlign = 'left';
   ctx.fillStyle = '#ffd84a';
   ctx.fillText(`★ ${stars.taken}/${stars.total}`, x + 14, y + 26);
   ctx.fillStyle = '#eef3ff';
   ctx.fillText(formatTime(elapsed), x + 120, y + 26);
+  if (touch) return;
   ctx.font = `7px ${PIXEL_FONT}`;
   ctx.fillStyle = accents.acc;
   ctx.fillText(`ESC QUIT   M ${muted ? 'SOUND OFF' : 'SOUND ON'}`, x + 14, y + 46);
