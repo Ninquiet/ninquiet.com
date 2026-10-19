@@ -1,0 +1,54 @@
+.canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 80;
+  image-rendering: pixelated;
+}
+
+.hitbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 66px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 81;
+  border-radius: 8px;
+}
+
+.hitbox:focus-visible { outline: 2px dashed var(--acc); outline-offset: 2px; }
+
+.pad {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  padding-inline: 16px;
+  z-index: 95;
+  pointer-events: none;
+}
+
+.cluster { display: flex; gap: 12px; pointer-events: auto; }
+
+.key {
+  width: 64px;
+  height: 64px;
+  font: 20px 'Press Start 2P', monospace;
+  color: var(--txt);
+  background: rgb(8 10 18 / 0.75);
+  border: 3px solid var(--acc);
+  border-radius: 10px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.key:active { background: var(--acc); color: var(--bg); }

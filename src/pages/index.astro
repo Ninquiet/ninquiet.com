@@ -4,6 +4,7 @@ import GlyphBackground from '../components/GlyphBackground.tsx';
 import Terminal from '../components/Terminal.tsx';
 import ProjectCard from '../components/ProjectCard.astro';
 import GitLog from '../components/GitLog.astro';
+import BitDroid from '../components/BitDroid.tsx';
 import { PROFILE } from '../data/profile';
 import { HOME_SECTIONS } from '../data/homeSections';
 import { getProjects, pickForSection, toTerminalEntry } from '../lib/projects';
@@ -20,7 +21,7 @@ const archiveCount = projects.length - shownCount;
     <div class="wrap hero-grid">
       <div class="intro">
         <p class="d hello">// hello, world</p>
-        <h1 class="name">jesús<br />angarita<span class="k">_</span></h1>
+        <h1 class="name"><span data-bitdroid-perch data-bitdroid-inset="0.37">jesús</span><br /><span data-bitdroid-ledge data-bitdroid-inset="0.37">angarita</span><span class="k">_</span></h1>
         <p class="role"><span class="k">{PROFILE.role}</span><br />{PROFILE.focus.join(' · ')}</p>
         <p class="d blurb">
           {PROFILE.years} years building virtual worlds,<br />tools for agents, and the occasional<br />pixel that shouldn't exist.
@@ -82,6 +83,7 @@ const archiveCount = projects.length - shownCount;
       </div>
     </div>
   </section>
+  <BitDroid client:only="react" />
 </Base>
 
 <style>
@@ -93,7 +95,7 @@ const archiveCount = projects.length - shownCount;
     gap: clamp(24px, 4vw, 56px);
     align-items: center;
   }
-  .hello { font-size: 13px; margin: 0 0 12px; }
+  .hello { font-size: 13px; margin: 0 0 44px; }
   .name {
     font-family: var(--display);
     font-size: clamp(48px, 8vw, 88px);

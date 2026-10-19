@@ -1,0 +1,61 @@
+export const PIXEL = 3;
+
+export const PLAYER = {
+  width: 30,
+  height: 42,
+  runSpeed: 330,
+  groundAccel: 2800,
+  airAccel: 1900,
+  friction: 2600,
+  gravity: 2300,
+  maxFall: 1150,
+  jumpVelocity: 1010,
+  doubleJumpVelocity: 880,
+  jumpCut: 0.45,
+  coyoteTime: 0.1,
+  jumpBuffer: 0.12,
+  dropTime: 0.22,
+  stompBounce: 760,
+  startInvulnerability: 1.2,
+};
+
+export const ENEMY = {
+  width: 34,
+  height: 24,
+  speed: 215,
+  accel: 1800,
+  gravity: 2300,
+  maxFall: 1150,
+  jumpVelocity: 1010,
+  spawnVelocity: 1250,
+  thinkInterval: 0.12,
+  reachHeight: 200,
+  reachDistance: 280,
+  spawnSchedule: [1.4, 13, 30],
+  respawnDelay: 3,
+  warningTime: 0.7,
+};
+
+export const STAR_SIZE = 24;
+
+export const PLATFORM_SELECTORS = [
+  '[data-bitdroid-perch]',
+  '[data-bitdroid-ledge]',
+  'main .hero .role',
+  'main .hero .chips',
+  'main [aria-label="Interactive terminal"]',
+  'main .prompt',
+  'main .card',
+  'main .card .body',
+  'main .card .tags',
+  'main .more',
+  'main .archive a',
+  'main .commit',
+  'main .cta',
+  'main .mail',
+  'body > footer',
+];
+
+export const STAR_SELECTOR = 'main .card';
+export const PERCH_SELECTOR = '[data-bitdroid-perch]';
+export const HEADER_SELECTOR = 'body > header';
