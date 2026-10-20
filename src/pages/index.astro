@@ -29,6 +29,7 @@ const archiveCount = projects.length - shownCount;
         <div class="chips">
           <span class="tag">{PROFILE.location}</span>
           <span class="tag">@ {PROFILE.company}</span>
+          <a class="tag cv-chip" href={PROFILE.cv} download={PROFILE.cvFileName}>cv.pdf ↓</a>
           <a class="tag" href={PROFILE.github}>github</a>
           <a class="tag" href={PROFILE.gitlab}>gitlab</a>
           <a class="tag" href={PROFILE.linkedin}>linkedin</a>
@@ -78,6 +79,7 @@ const archiveCount = projects.length - shownCount;
       <p class="prompt">./contact.sh</p>
       <h2 class="cta">Let's build something<br />that shouldn't exist yet<span class="k">.</span></h2>
       <a class="mail" href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>
+      <a class="cv-download" href={PROFILE.cv} download={PROFILE.cvFileName}>❯ download cv.pdf</a>
       <div class="chips">
         <a class="tag" href={PROFILE.github}>github.com/Ninquiet</a>
         <a class="tag" href={PROFILE.gitlab}>gitlab.com/Ninquiet</a>
@@ -115,6 +117,17 @@ const archiveCount = projects.length - shownCount;
   .contact { display: flex; flex-direction: column; align-items: flex-start; }
   .cta { font-family: var(--display); font-size: clamp(32px, 5vw, 56px); letter-spacing: -0.03em; margin: 0 0 24px; }
   .mail { font-size: clamp(16px, 2.4vw, 22px); }
+  .cv-chip { color: var(--acc); border-color: var(--acc); }
+  .cv-download {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: var(--bg);
+    background: var(--acc);
+    box-shadow: 0 -3px 0 0 var(--acc), 0 3px 0 0 var(--acc), -3px 0 0 0 var(--acc), 3px 0 0 0 var(--acc), 6px 6px 0 0 color-mix(in srgb, var(--acc2) 60%, transparent);
+  }
+  .cv-download:hover { text-decoration: none; filter: brightness(1.1); }
   @media (max-width: 860px) {
     .hero-grid { grid-template-columns: minmax(0, 1fr); }
   }

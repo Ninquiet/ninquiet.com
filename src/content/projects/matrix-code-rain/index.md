@@ -11,38 +11,44 @@ featured: true
 order: 2
 ---
 
-Here is a little preview of an effect created to give the feeling of matrix trainning code, is a single shader
+A Matrix-style "code rain" effect built in a single shader.
 
-For the random changing text, I've created a texture with random text, organized on a grid with perfect distnaces between each other
+## Problem
+
+The goal was the feeling of training inside the Matrix: endless columns of changing characters falling around you, without simulating thousands of individual characters.
+
+## Approach
+
+For the random changing characters, I created a texture of random symbols laid out on a grid with even spacing.
 
 ![VFX - Matrix Code Rain](./image-1.png)
 
-Then, by adding a constant offset on Y, and moving a little X on fixed values (using floor node to keep the values fixed) I was able to have a changing letters effect:
+Then, by adding a constant offset on Y and nudging X by fixed steps (a floor node keeps the values snapped), I got characters that change over time:
 
 ![VFX - Matrix Code Rain](./image-2.png)
 
-Then, I've created simple texture of falling lines, where the tip is specially bright, and tilled them making them an inffinite pattern
+Next, I made a simple texture of falling lines with an especially bright tip, and tiled it into an infinite pattern.
 
 ![VFX - Matrix Code Rain](./image-3.png)
 
-And using some of the already calculated logic before, I added some movement
+Reusing some of the logic from before, I added movement:
 
 ![VFX - Matrix Code Rain](./image.png)
 
-Then after multiplying both effects, we have the perfect base:
-
-Now we just need to add some extra passes, combine them, and create a smooth fading on top and bottom of the sahep
+Multiplying both effects gives the base. From there I added extra passes, combined them, and faded the top and bottom of the shape smoothly.
 
 ![VFX - Matrix Code Rain](./image-5.png)
 
-And multiply by a color before output the value
+Finally, everything is multiplied by a color before output.
 
 ![VFX - Matrix Code Rain](./image-6.png)
 
-So we have this at the end
-
-Now we just need to create a mesh with inverted faces, that fits with the effect of infinite top, but without breaking visually because the culling, and we are done
+The last step is a mesh with inverted faces that fits the infinite-top look without visual breaks from culling.
 
 ![VFX - Matrix Code Rain](./image-7.png)
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/ro8pqshcnUw" title="VFX - Matrix Code Rain video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
+
+## Performance
+
+Everything happens in one shader on a single mesh, with no particles or per-character objects, which keeps the effect cheap enough to surround the player.

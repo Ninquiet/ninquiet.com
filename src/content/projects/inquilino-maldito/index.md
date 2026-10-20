@@ -16,88 +16,90 @@ order: 3
 
 ![Game test: Inquilino Maldito](./ext-d903411e1f.png)
 
-## Video:
+## Video
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/5BX8Hnrxqh0" title="Game test: Inquilino Maldito video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
 
-## Build:
+## Build
 
-Puedes jugar el juego acá:
+You can play the game here:
 [https://simmer.io/@Ninquiet/inquilinomalditodemotecnica](https://simmer.io/@Ninquiet/inquilinomalditodemotecnica)
 
-## Resumen:
+## Summary
 
-Es un juego en el que debemos acabar con los zombies y escapar, estos zombies no son solo estaticos sino que tienen un sistema de movimiento bastante logrado
+It's a game where you have to take down the zombies and escape. The zombies aren't just static; they have a fairly polished movement system.
 
-## Funcionamiento:
+## How it works
 
-### State Machine:
+### State Machine
 
 ![Game test: Inquilino Maldito](./ext-547bc7fa17.png)
 
-Diseñe un sistema de State machine usando generics que me permite re utilizarlo en cualquier parte, incluso en otros proyectos luego de este, este sistema funciona con un StateMachine base que es el nucleo principal de control y la ultima desición, luego tenemos el State Factory que se encarga de organinzar y retornar los diferentes estados existentes, y por ultimo los BaseState (y sus variantes), que se encargan de gestionar los diferentes estados, cómo estar en IDLE luego caminar, luego moverse, y así sucesivamente.
+I designed a state machine system using generics, which lets me reuse it anywhere, including in later projects. The system is built around a base StateMachine, which is the core control unit and makes the final decision. Next is the State Factory, which organizes and returns the available states. Finally, there are the BaseState classes (and their variants), which handle the individual states, such as going from IDLE to walking, then moving, and so on.
 
-Para hacer este sistema de una forma modular, cree un cuarto integrante que se encarga de gestionar las variables que son de vital importancia para los estados y sub estados, cómo para el state machine tambien, así nace Base Vars.
+To keep the system modular, I created a fourth component that manages the variables that are essential to the states and sub-states, as well as to the state machine itself. That is how Base Vars came about.
 
-Teniendo esta estructura, la transicioné para que funcione con estructuras genericas, y de esta forma podria modificarla a mi gusto, con esto pude crear variantes cómo ZombieStateMachine, o más adelante ZombieDistanceStateMachine que hereda de StateMachine y solo modifica algunos estados y algunas variables (y así ese zombie no tuvo que ser escrito desde cero).
+With this structure in place, I converted it to work with generic types so I could adapt it however I needed. This let me create variants such as ZombieStateMachine, and later ZombieDistanceStateMachine, which inherits from StateMachine and only modifies some states and variables (so that zombie didn't have to be written from scratch).
 
 ![Game test: Inquilino Maldito](./ext-01d4efe361.png)
 
-(ejemplo de uso de estructura generica)
+(example of the generic structure in use)
 
-### Player:
+### Player
 
-El player no usa state machine, usa PlayerController que hace de base de control de una forma general, las partes importantes del personaje sonn el poder contnrolar su vida (cómo tambien la de los zombies usando LifeController), poder controlar cuantas llaves lleva puestas con KeysHandler, las armas que puede usar con PlayerWeaponHandler, o el poder recoger items con PlayerItemPicker.cs, entre muchos otros sub sistemas que sostienen el jugador.
+The player doesn't use a state machine. Instead, it uses a PlayerController that acts as the general control base. The key parts of the character are managing its health with LifeController (which the zombies use as well), tracking how many keys it is carrying with KeysHandler, handling the weapons it can use with PlayerWeaponHandler, and picking up items with PlayerItemPicker.cs, along with many other subsystems that support the player.
 
-### Armas y Ataque:
+### Weapons and Attacks
 
-La forma en que funciona el sistema de daño y ataque es que el personaje que ataca revisa si e objeto atacado posee un LifeController, si lo tiene entonces se notifica del daño, el lifeController a su vez usando un sistema de eventos, notifica a todas las clases interesadas de los cambios, e incluso de la posible muerte del jugador.
+The damage and attack system works like this: the attacking character checks whether the target object has a LifeController. If it does, the damage is reported to it. The LifeController, in turn, uses an event system to notify every interested class of the changes, including the player's possible death.
 
-El Zombie a distancia realiza el ataque desde su sistema de estados, sin embargo el zombie cuerpo a cuerpo hace uso de una tercera clase llamada EnemyBaseAttack, esto para poder tercerizar el proceso de ataque fisico que es un poco más complejo que el realizado por los zombies a distancia.
+The ranged zombie performs its attack from within its state system, while the melee zombie uses a third class called EnemyBaseAttack. This delegates the physical attack process, which is a bit more complex than the ranged zombies' attack.
 
-### La muerte:
+### Death
 
-Para este efecto y muchos otros que se encuentran en el prototipo hice uso de Cinemachine, al realizar el cambio de camara y jugar con los valores en el UI se logra el efecto de que el jugador cae rendido al morir.
+For this effect, and many others in the prototype, I used Cinemachine. By switching cameras and adjusting values in the UI, I created the effect of the player collapsing on death.
 
-Por su lado, los Zombies manejan la muerte desde uno de sus estados tambien,
+The zombies, for their part, also handle death through one of their states.
 
-Inteligencia del enemigo:
-Traté de realizar el state machine de la forma más pulida que pude, así que hay cosas cómo que si el zombie tiene asignados waypoints, zombie seguirá estos waypoints llegado el caso de que pierda de vista al usuario, al momento de regresar al waypoint siempre calcula cual es el más cercano.
+### Enemy AI
+I tried to make the state machine as polished as I could, so it includes details such as this: if a zombie has assigned waypoints, it follows them whenever it loses sight of the player, and when returning to its waypoints it always calculates which one is closest.
 
 ![Game test: Inquilino Maldito](./ext-1a9e0174f2.png)
 
-Para lograr el movimiento del enemigo usé un sistema de navmesh, interconectado con el StateMachine del zombie y controlado por los estados
+To move the enemy, I used a NavMesh system connected to the zombie's StateMachine and controlled by its states.
 
-Para la animación del zombie disparando usé un poco de blender.
+I used a bit of Blender for the shooting zombie's animation.
 
-## Effectos
+## Effects
 
-Para una trasnción más limpia y pulida, hice uso de Cinemachine, y no solo esto sino tambien para efectos de camará cómo el shake, para el cual usé el sistema de impulsos.
+For cleaner, more polished transitions I used Cinemachine. I also used it for camera effects such as screen shake, for which I used the Impulse system.
 
-Para el efecto de disparo usé el sistema de particulas, y algunas texturas basicas creadas en photoshop
+For the gunshot effect I used the particle system along with some basic textures I created in Photoshop.
 
-## Objeetos
+## Items
 
-El sistema de objetos permite al jugador interactuar cón objetos de munición, objetos de vida, objetos de escudo, y objetos de llaves, estos ultimos són usados para abrir puertas.
+The item system lets the player interact with ammo, health, shield, and key pickups. Keys are used to open doors.
 
 ![Game test: Inquilino Maldito](./ext-361e82f8ae.png)
 
-## Notificaciones
+## Notifications
 
-Implementé un sistema de Notificaciones a modo de feedback, así el usuario tiene claridad en cuanto a si recogio o no la munición cuanto recibió, si el objeto lo curó o le incrementó el escudo, e incluso para saber la razón por la cual una puerta no se abre, es la forma de interactuar con el usuario.
+I implemented a notification system to give the player feedback. It makes it clear whether they picked up ammo and how much they received, whether an item healed them or boosted their shield, and even why a door won't open. It's the game's main way of communicating with the player.
 
 ![Game test: Inquilino Maldito](./ext-0f246427bb.png)
 
 ## UI
 
-Para la interfaz de usuario usé el sistema de acciones ya creado, al subscribir a cada una de las clases (por ejemplo lifeController del player para recibir información de la vida, o PlayerWeaponHandler para recibir información de las armas), se pudo crear un sistema preciso de cada uno de los datos imporntantes a comunicar.
+For the user interface I used the existing action system. By subscribing to each relevant class (for example, the player's LifeController for health data, or PlayerWeaponHandler for weapon data), I was able to build an accurate display of each piece of important information the player needs.
 
 ![Game test: Inquilino Maldito](./ext-f91fe134d7.png)
 
-## Sonidos
+## Sounds
 
-Para el sistema de sonido cree una base llamada BaseSoundPlayer que se encarga de reproducir en un AudioSource asignado un clip especifico, luego, de esta clase derivé PlayerSounds y ZombieSounds, estas clases guardan en si referencias de sonidos especificas que usaránm de esta forma no repetimos codigo y es bastante util.
+For the sound system I created a base class called BaseSoundPlayer, which plays a specific clip on an assigned AudioSource. From this class I derived PlayerSounds and ZombieSounds, which hold references to the specific sounds they use. This avoids duplicated code and has proven quite useful.
 
-## Assets usados:
+## Assets used
 
-Para hacer transiciones rapidamente.
+[**DoTween**](https://dotween.demigiant.com)
+
+For quick transitions.

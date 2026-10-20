@@ -117,6 +117,12 @@ const contact: Command = {
   ],
 };
 
+const cv: Command = {
+  name: 'cv',
+  summary: 'download my cv (pdf)',
+  run: () => [['downloading ', k('cv.pdf', PROFILE.cv)], [d('click the link if it does not start on its own')]],
+};
+
 const sudo: Command = {
   name: 'sudo',
   summary: 'try: sudo hire-me',
@@ -126,6 +132,7 @@ const sudo: Command = {
       ['[sudo] password for recruiter: ********'],
       [k('access granted.'), ' running ./contact.sh ...'],
       ['> ', k(PROFILE.email, `mailto:${PROFILE.email}`)],
+      ['> ', k('cv.pdf', PROFILE.cv)],
     ];
   },
 };
@@ -152,7 +159,7 @@ const rm: Command = {
   run: () => [[p('rm: permission denied. the portfolio stays.')]],
 };
 
-export const COMMANDS: Command[] = [help, whoami, ls, open, about, skills, contact, sudo, theme, clear, echo, rm];
+export const COMMANDS: Command[] = [help, whoami, ls, open, about, skills, contact, cv, sudo, theme, clear, echo, rm];
 
 export function resolveCommand(name: string): Command | undefined {
   return COMMANDS.find((command) => command.name === name || command.aliases?.includes(name));

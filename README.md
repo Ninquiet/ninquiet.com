@@ -47,6 +47,10 @@ Body in markdown. Images: ![alt](./shot.webp)
 
 The terminal (`ls`, `open <slug>`) picks it up automatically.
 
+## Updating the CV
+
+The downloadable CV is `public/files/jesus-angarita-cv.pdf`, a copy of `C:\CV\Jesus David Angarita CV.pdf`. When the CV changes, copy the new PDF over it and push.
+
 ## Adding a terminal command
 
 Add a `Command` object to `src/lib/terminal/commands.ts` and append it to `COMMANDS`.

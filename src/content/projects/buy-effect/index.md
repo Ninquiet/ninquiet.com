@@ -11,10 +11,22 @@ featured: true
 order: 3
 ---
 
-This effect was created to be able to duplicate an already existing object and perform the effect without destroying the original one, the challenge on this effect is that this is created for a wide range of objects, and adapts to each one of them, is like this because the community could upload any avatar or object and even using their own custom shaders and materials, so I had so be able to create the effect with a procedural structure that adapts itself to each one of them.
+A purchase effect that plays on any item or avatar a user buys, without touching the original object.
+
+## Problem
+
+The community can upload any avatar or object, each with its own custom shaders and materials. The effect had to work on all of them and run on a copy, never destroying or modifying the original.
+
+## Approach
+
+The effect duplicates the target and builds itself procedurally around that copy, adapting to each object's shape and materials instead of relying on hand-made versions per item.
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/KvMahG42MJM" title="VFX: Buy Effect video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
 
-This is a preview of the effect being applied to different kind of objects:
+Here it is applied to different kinds of objects:
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/xS5fnR28EHM" title="VFX: Buy Effect video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
+
+## VR constraints
+
+Because the input is unpredictable user-generated content, the effect has to stay robust and affordable on objects of very different complexity, so it can play in a crowded VR scene without hurting performance.

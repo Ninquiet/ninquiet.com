@@ -9,6 +9,18 @@ video: "/media/mirror-vr.webp"
 legacy: true
 ---
 
-This is a mirror done for VR, is specially complex because on VR each of our eyes has a different perspective, so it needs to se something different in the mirror, I had to use a complex system of cameras  to calculate the correct implementation of this effect, so the magic of this is more done by code than by shaders
+A working mirror for VR, where you see your own avatar reflected correctly.
+
+## Problem
+
+In VR each eye has a different point of view, so a single reflection texture looks wrong: the mirror has to show each eye its own correct reflection or the image breaks the sense of depth.
+
+## Approach
+
+Most of the work is in code rather than shaders: a camera system calculates the reflected view for each eye and feeds the right image to the mirror surface for that eye.
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/rm-tMkqEp4Q" title="VFX-Dev: Mirror VR video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
+
+## VR constraints
+
+A mirror means rendering the scene again for the reflection, once per eye, so its cost has to be managed carefully to avoid dropping frames, which in VR directly hurts comfort.

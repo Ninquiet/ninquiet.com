@@ -11,6 +11,8 @@ export const PROFILE = {
   github: 'https://github.com/Ninquiet',
   gitlab: 'https://gitlab.com/Ninquiet',
   linkedin: 'https://www.linkedin.com/in/ninquiet',
+  cv: '/files/jesus-angarita-cv.pdf',
+  cvFileName: 'Jesus Angarita CV.pdf',
   description:
     'Agentic Software Engineer specialized in Unity and XR. 6 years building virtual worlds, tools for AI agents, and the occasional pixel that should not exist.',
 };

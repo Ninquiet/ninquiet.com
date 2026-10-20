@@ -30,116 +30,116 @@ featured: true
 order: 2
 ---
 
-Repositorio: https://gitlab.com/Ninquiet/ninquietuoc-2d-pec1
+Repository: https://gitlab.com/Ninquiet/ninquietuoc-2d-pec1
 
 ![Game: Escapa de la Escuela de Insultos](./ext-256d83715a.png)
 
-## Tabla de Contenidos
+## Table of Contents
 
-- [Juego En WebGl](#juego-en-webgl)
+- [Play in WebGL](#play-in-webgl)
 
-- [Resumen](#resumen)
+- [Summary](#summary)
 
-[Mecánicas](#mecanicas)
+[Mechanics](#mechanics)
 
-- [Movimiento por los escenarios](#movimiento-por-los-escenarios)
+- [Moving Through the Scenes](#moving-through-the-scenes)
 
-- [Batallas de Insultos](#batallas-de-insultos)
+- [Insult Battles](#insult-battles)
 
-[Estructura Lógica del Código](#estructura-logica-del-codigo)
+[Code Logic and Structure](#code-logic-and-structure)
 
-- [Forma en que escribí el código](#forma-en-que-escribí-el-codigo)
+- [How I Wrote the Code](#how-i-wrote-the-code)
 
-- [Librerías externas](#librerías-externas)
+- [External Libraries](#external-libraries)
 
-- [Estructura](#estructura)
+- [Structure](#structure)
 
-- [Núcleo Base](#núcleo-base)
+- [Base Core](#base-core)
 
-- [Núcleo Story](#núcleo-story)
+- [Story Core](#story-core)
 
-- [Núcleo InsultsBattle](#núcleo-insultsbattle)
+- [InsultsBattle Core](#insultsbattle-core)
 
-- [Ilustraciones](#ilustraciones)
+- [Illustrations](#illustrations)
 
-## Video del juego
+## Game Video
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/vO3QHNyNFLE" title="Game: Escapa de la Escuela de Insultos video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
 
-## Juego En WebGl
+## Play in WebGL
 
-Para jugar, visita el siguiente enlace: [Juega "Escapa de la Escuela de Insultos" aquí](https://simmer.io/@Ninquiet/escapa-de-la-escuela-de-insultos)
+To play, visit this link: [Play "Escapa de la Escuela de Insultos" here](https://simmer.io/@Ninquiet/escapa-de-la-escuela-de-insultos)
 
-## Resumen
+## Summary
 
-Este es un juego que toma como base las batallas de insultos en Monkey Island, donde el contrincante te insultará, tu tomarás una alternativa y según esto responderás bien o no a su ataque y será tu turno de atacarlo a el.
+This game is based on the insult sword fights from Monkey Island: your opponent insults you, you pick a comeback, and depending on your choice you either counter their attack or you don't. Then it's your turn to insult them.
 
-## Mecanicas
+## Mechanics
 
-El juego combina el movimiento por los escenarios con elecciónes, con las batallas de insultos, de esta manera en cada escenario hay algo que encontrar o algún enemigo que vencer para poder continuar.
+The game combines exploring the scenes through choices with insult battles, so every scene has something to find or an enemy to defeat before you can move on.
 
-### Movimiento por los escenarios
+### Moving Through the Scenes
 
 ![Game: Escapa de la Escuela de Insultos](./ext-a1262942cb.png)
 
-Los escenarios son un papel fundamental en el juego, para moverte atraves de ellos solo debes oprimir el botón de tu escenario objetivo, estos son tu medio para moverte a lo largo del juego, en algunos encontrarás por ejemplo una llave, en muchos otros encontraras diversos enemigos que solo se encuentran en estos lugares, debes sortear los diferentes escenarios para poder llegar a la puerta con la llave y escapar.
+The scenes play a central role in the game. To move between them, just press the button for the scene you want to go to; they are how you progress through the game. In some you'll find items such as a key, while in many others you'll run into enemies that only appear in those places. You have to work your way through the different scenes to reach the door with the key and escape.
 
-### Batallas de Insultos
+### Insult Battles
 
 ![Game: Escapa de la Escuela de Insultos](./ext-9111cdf2d8.png)
 
-En las batallas de insultos el enemigo iniciará el ataque, eligiendo de forma aleatoria un insulto, y el jugador deberá elegir la respuesta correcta entre tres posibilidades, si el jugador elige correctamente el ataque enemigo no tendrá efecto, sin embargo, si se equivoca, el ataque enemigo dañará al jugador.
+In insult battles, the enemy opens by picking a random insult, and the player must choose the correct comeback out of three options. If the player chooses correctly, the enemy's attack has no effect; if not, the attack damages the player.
 
-Luego de esto, será el turno del jugador para insultar a su enemigo, entonces, el jugador elegirá un insulto de las posibilidades mostradas (elegidas de forma aleatoria de la lista de insultos), y el enemigo deberá tratar de responder el insulto con la respuesta correcta.
+Then it's the player's turn to insult the enemy. The player picks an insult from the options shown (randomly drawn from the insult list), and the enemy has to try to answer it with the correct comeback.
 
-## Estructura Logica del Codigo
+## Code Logic and Structure
 
-### Forma en que escribí el codigo:
+### How I Wrote the Code
 
-El codigo está escrito con la intención de implementar el Self Comment Code (trato de seguir los lineamientos del libro Clean Code), tambien he escrito el codigo en inglés (a excepción de las partes relacionadas a algo que se vaya a mostrar al usuario, cómo dialogos o textos) esto debido a que es una convención estandar internacional hacerlo así (espero no haya problema).
+The code is written following the self-documenting code approach (I try to follow the guidelines from the book Clean Code). I also wrote the code in English (except for anything displayed to the player, such as dialogue or other text), since that is the standard international convention.
 
-Inicialmente cree el codigo para funcionar con el sistema de Task de C#, pero al finalizar el juego y exportarlo a WebGl, descubrí que WebGl no trabaja muy bien (por no decir que para nada) con los Delay temporales, por lo tanto me vi obligado a buscar alternativas, así que, uso ampliamente DoTween (librería gratuita) y UniTask (librería gratuita tambien)
+I originally built the code around C#'s Task system, but when I finished the game and exported it to WebGL, I discovered that WebGL doesn't handle timed delays well (if at all). So I had to look for alternatives, and I ended up making extensive use of DoTween and UniTask (both free libraries).
 
-### Librerias externas:
+### External Libraries
 
 [**DoTween**](https://dotween.demigiant.com)
 
-He usado DoTween principalmente para gestionar animaciones simples, no soy muy fan de usar Animator para cosas simples, más que todo por su gran consumo en performance.
+I mainly used DoTween to handle simple animations. I'm not a big fan of using the Animator for simple things, mostly because of its high performance cost.
 
-[**UniTask**](https://dotween.demigiant.com)
+[**UniTask**](https://github.com/Cysharp/UniTask)
 
-Unitask es similar al sistema de Task de c#, pero optimizado para funcionar con Unity, así que gracias a el pude solucionar los problemas con Delay en web sin necesidad de cambiar todo el proyecto.
+UniTask is similar to C#'s Task system but optimized for Unity, so thanks to it I was able to fix the delay issues on the web build without rewriting the whole project.
 
-### Estructura
+### Structure
 
 ![Game: Escapa de la Escuela de Insultos](./ext-5303250b1c.jpg)
 
-Tomé como base el juego de aventuras, pues quería crear un juego en que no fuera solo una batalla sino una pequeña aventura, sin embargo lo modifiqué bastante (tal vez ahora sea un paralelo muy lejano), esta estructura de modo Historia se nutre en tiempo real del documento **Story** ubicado al interior de la carpeta **Resources**
+I used the adventure game as a starting point, because I wanted the game to be a small adventure rather than just a single battle. However, I modified it heavily (it may now be only a distant relative of the original). This Story mode structure is fed in real time by the **Story** document located inside the **Resources** folder.
 
-### Nucleo Base:
+### Base Core
 
-Este nucleo estaría compuesto por los Scripts generales y de control, (Los que se pueden encontar en "/Scripts"), su principal exponente es **GameplayManager**, no es un script muy largo, pero su funcion es iniciar el juego y hacer de puente entre los distintos eventos que suceden, así conecta el modo historia con las batallas de insultos, y viceversa.
+This core is made up of the general and control scripts (found in "/Scripts"). Its main component is **GameplayManager**. It's not a long script, but its job is to start the game and act as a bridge between the different events that happen, connecting Story mode with the insult battles and vice versa.
 
-### Nucleo Story:
+### Story Core
 
 ![Game: Escapa de la Escuela de Insultos](./ext-8eb337c81c.png)
 
-El nucleo Story se compone por todos los Scripts al interior de **"/Scripts/Story"**, el manejador principal es **StoryGameplayManager**, este se encarga de gestionar la historia y su loop. Cuando se inicializa, hace uso de **StoryManager** para traducir la información del Json Story a nodos, luego de esto inicia el texto y las opciones, para mostrar el texto usa **StoryUIManager** que es el encargado de todo los UI correspondiente a Story, para interconectar todo hago uso de un sistema de Acciones a modo de evento.
+The Story core consists of all the scripts inside **"/Scripts/Story"**. The main handler is **StoryGameplayManager**, which manages the story and its loop. On initialization, it uses **StoryManager** to translate the data from the Story JSON into nodes, then starts the text and options. To display the text it uses **StoryUIManager**, which is responsible for all Story-related UI. To connect everything, I use an Action-based event system.
 
-Cuando el modulo Story se encuentra que en el escenario en el que se encuentra el jugador hay un Enemigo, notifica a GameplayManager que hay un enemigo y que tipo de enemigo es, GameplayManager usa "UIManager" para activar la interfaz de batalla y notifica a "InsultsBattleManager" para que inicialize la batalla con el enemigo indicado.
+When the Story module detects an enemy in the player's current scene, it notifies GameplayManager that there is an enemy and what type it is. GameplayManager uses "UIManager" to activate the battle interface and notifies "InsultsBattleManager" to start the battle with that enemy.
 
-Una vez que la batalla finaliza, GameplayManager notifica a StoryGameplayManager y este continua con el modo historia.
+Once the battle ends, GameplayManager notifies StoryGameplayManager, which resumes Story mode.
 
-### Nucleo InsultsBattle
+### InsultsBattle Core
 
 ![Game: Escapa de la Escuela de Insultos](./ext-6b613c4d9b.png)
 
-Este nucleo se encarga de gestionar todo lo relacionado con batallas, se le notifica que enemigo es el con el cual se batallará, y este se encarga de organizar todo lo relacionado a inciar el enemigo, y controlar la interfaz con ayuda de "StoryUIManager", si el jugador muere se notifica la derrota a GameplayManager y este activa la pantalla derrota, por el contrario, si el jugador gana, tambien se notifica a GameplayManager y este cierra el modo batalla y continua con el modo historia.
+This core handles everything related to battles. It is told which enemy the battle will be against, and it takes care of setting up that enemy and controlling the interface with the help of "StoryUIManager". If the player dies, the defeat is reported to GameplayManager, which shows the defeat screen. If the player wins, GameplayManager is also notified, closes battle mode, and resumes Story mode.
 
-Los insultos son cargados del archivo **TestingInsults** en la carpeta /Resources, el encargado de deserializar estos archivos y convertirlo a los DTO y posteriormente a los formatos de clases finales es **Insults Manager**
+The insults are loaded from the **TestingInsults** file in the /Resources folder. **Insults Manager** is responsible for deserializing these files into DTOs and then converting them into the final class formats.
 
-## Ilustraciones
+## Illustrations
 
 ![Game: Escapa de la Escuela de Insultos](./ext-b7b9326243.png)
 
-Las ilustraciones las he hecho yo, no son muy bonitas pero fueron hechas con mucho amor <3
+I made the illustrations myself. They're not the prettiest, but they were made with a lot of love.

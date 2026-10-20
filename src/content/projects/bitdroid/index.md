@@ -18,184 +18,183 @@ order: 1
 
 ## BITDROID
 
-## Video:
+## Video
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/00tMO94JzMw" title="Game: BitDroid video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
 
-## Build:
+## Build
 
-### WEBGL:
+### WebGL
 
 [simmer.io/@Ninquiet/bitdroid](https://simmer.io/@Ninquiet/bitdroid)
 
-### Android APK:
+### Android APK
 
 [drive.google.com/file/d/1uboAKwvmPvxGybUzf7whBWIWJWcflw6M/view](https://drive.google.com/file/d/1uboAKwvmPvxGybUzf7whBWIWJWcflw6M/view?usp=sharing)
 
-## Resumen:
+## Summary
 
-Es un juego de plataformas, para moverte puedes usar WASD o las flechitas, para saltar usa la barra espaciadora, para entrar a menú pausa puedes usar la tecla Esc, y el mouse junto al click izquierdo para disparar, si tienes municiones claro.
+BitDroid is a platformer. You move with WASD or the arrow keys, jump with the space bar, and open the pause menu with Esc. You aim with the mouse and shoot with the left click, as long as you have ammo, of course.
 
-puedes acabar con enemigos saltandoles encima, pero si estos te tocan morirás instantaneamente a menos de que tengas puesto tu casco, en cuyo caso perderas tu casco pero podrás seguir luchando, puedes morir tambien si una puerta te cae encima o si caes en las puas
+You can defeat enemies by jumping on top of them, but if they touch you, you die instantly unless you are wearing your helmet. In that case you lose the helmet but can keep fighting. You can also die if a door falls on you or if you land on spikes.
 
-## Funcionamiento:
+## How it works
 
-### Iluminación 2D:
+### 2D lighting
 
-He usado el sistema de iluminación 2D para dar mayor interes al juego, al ser juego de plataformas-terror-Acción se beneficia mucho de poder agregar puntos de interés o de limitar la visibilidad del juegador según sea la zona, esto da mucho con lo que jugar al momento de crear diferentes tipos de experiencias, por ejemplo al inicio es mucho más facil ver la dirección que el jugador tiene que tomar pues está mucho más iluminado, pero al avanzar vas perdiendo luminocidad y y ca creando una sensación de terror lentamente a lo desconocido.
+I used the 2D lighting system to make the game more engaging. As a platformer mixing horror and action, it benefits a lot from being able to highlight points of interest or limit the player's visibility depending on the area. This gives plenty of room to design different kinds of experiences. For example, at the start it is much easier to see which way the player needs to go because the area is well lit, but as you progress the light fades, slowly building a sense of dread toward the unknown.
 
-### Activadores, Puertas y trampas
+### Triggers, doors and traps
 
-Los activadores son botones que funcionan para activar otros objetos, por el momento solo están asociados a las puertas que al mismo tiempo funcionan como trampas, al oprimir el activador, este moverá la puerta de una posicion a otra abriendo o cerrando la puerta, sin embargo no existe solo un tipo de activador, algunos solo suben la puerta mientras estén siendo presionados, pero al liberarlos la puerta bajara nuevamente, y acá está la trampa pues si el personaje es aplastado por la parte baja de la puerta morirá instantaneamente.
+Triggers are buttons that activate other objects. For now they are only linked to doors, which also work as traps. When the player presses a trigger, it moves the door from one position to another, opening or closing it. There is more than one type of trigger, though: some only raise the door while they are being pressed, and when released the door comes back down. That is where the trap lies, because if the character is crushed by the bottom of the door, they die instantly.
 
-### Escaleras:
+### Ladders
 
-Las escaleras fueron un pequeño reto, porque al estar subiendo o bajando las escaleras el personaje tiene que desactivar su gravedad y posibilitar el movimiento en el eje Y, sin embargo al poder ser atacado el personaje podia volar sin rumbo, así que fueron necesarios muchos procesos de iteración para lograr dar con la forma correcta de implementarlas, tambien lara implementar la animación agergué un segundo layer en el animator el cual cambiaba de peso segun si el personaje estaba escalando o no, todo lo relacionado a este sistema se encuentra en **PlayerClimbController**
+Ladders were a small challenge. While climbing up or down, the character has to disable gravity and allow movement on the Y axis. However, since the character can be attacked while climbing, they could end up flying around aimlessly, so it took many iterations to find the right way to implement them. For the animation, I added a second layer to the Animator whose weight changes depending on whether the character is climbing or not. Everything related to this system lives in **PlayerClimbController**.
 
-### Inteligencia Artificial mejorada:
+### Improved AI
 
-Mejoré la inteligencia artificial al momento de tomar desiciones, así sus ataques ahora son mas precisos y trata de predecir mejor al jugador, cómo tambien trata de evadir obstaculos del escenario, por ejempo cuando se encuentran bloqueados por una parte del escenario en la dirección a la que se están moviento, intentarán saltarla para continuar con la persecucíon.
+I improved the enemy AI's decision-making, so their attacks are now more precise and they try to better predict the player. They also try to get around obstacles in the level. For example, when part of the level blocks them in the direction they are moving, they try to jump over it to continue the chase.
 
-### Las cajas pesadas pueden matar:
+### Heavy boxes can kill
 
-Las cajas pesadas pueden lastimar a quienes les caingan encima (solo las cajas pesadas no destructibles), esto significa que pueden matar cualquier enemigo, cómo tambien que pueden matar al jugador si algún enemigo empuja alguna sobre el.
+Heavy boxes can hurt anyone they fall on (only the heavy, non-destructible boxes). This means they can kill any enemy, and they can also kill the player if an enemy pushes one onto them.
 
-### Creditos:
+### Credits
 
-Cree una simple pantalla para los creditos.
+I created a simple credits screen.
 
 
-### Mejorado el paralax:
+### Improved parallax
 
-Ahora el paralax es más amplio y abarca diferentes tipos de alturas cómo tambien ahora tiene efectos dinamicos cómo los son los rayos
+The parallax is now wider, covers different heights, and includes dynamic effects such as lightning.
 
-### Tilemap de varias capas:
+### Multi-layer tilemap
 
-Ahora el tilemap del escenario completo está creado por 4 diferentes tilemaps, cada uno con su función (por ejemplo hay uno que la unica funcion es agregar nuevo contenido de fondo y el parte frontal del escenario, unitcamente estetic)
+The full level tilemap is now built from 4 different tilemaps, each with its own purpose (for example, one exists only to add new background content and the front part of the level, purely for aesthetics).
 
-### Nueva Imagen de Intro y Splash Screen:
+### New intro image and splash screen
 
-### Nuevo nivel completamente modificado:
+### New, completely reworked level
 
-El nuevo nivel esta diseñado para tener en cuenta cómo el usuario va conectandose con la jugabilidad, así de forma muy clara el usuario va entendiendo que es un activador, al estar este en su primera estancia que es totalmente segura, luego entiende que puede disparar a distancia al activar el segundo activador con el arma a distancia (siendo esta la unica forma de activarlo), ve un enemigo morir en un acantilado así que puede deducir que es peligroso caer, y hay un segundo enemigo que es dificil de evadir, y muy posiblemente lastimará al jugador, perdiendo así su casco, enseñandole que al ser lastimado perderá su casco, y si es lastimado nuevamente morirá, al estar cerca del inicio no sera un golpe grande así que aprenderá sin necesidad de frustración, y así con otras mecanicas.
+The new level is designed around how the player gradually connects with the gameplay. The player clearly learns what a trigger is, because the first one appears in a completely safe starting area. Then they learn they can shoot at range, because the second trigger can only be activated with the ranged weapon. They see an enemy die by falling off a cliff, so they can deduce that falling is dangerous. A second enemy is hard to dodge and will most likely hurt the player, making them lose their helmet. This teaches them that getting hurt costs the helmet, and getting hurt again means death. Since this happens close to the start, it is not a big setback, so they learn without frustration. The same approach applies to other mechanics.
 
-### Nuevos sonidos:
+### New sounds
 
-Agregué nuevos sonidos para cosas cómo el inicio de la batalla con el jefe, o los activadores, para crear estos sonidos usé Udio que es una plataforma para crear sonidos con inteligencia artificial, y tambien modifiqué los resultados con Adobe Audition
+I added new sounds for things like the start of the boss fight and the triggers. To create them I used Udio, an AI sound generation platform, and then edited the results in Adobe Audition.
 
-### Nueva imagen del personaje:
+### New character look
 
-Modifiqué cada uno de los sprites del personaje así como sus power ups, para darle más identidad, haciendo que el casco sea algo mas caracteristico (que incluso usé para la ilsutración de la portada), y creando nuevas animaciones, cómo la animación de escalar.
+I reworked every character sprite, as well as the power-ups, to give the character more identity. I made the helmet more distinctive (I even used it in the cover illustration) and created new animations, such as the climbing animation.
 
-### Actualizada la rotación del arma:
+### Updated weapon rotation
 
-Ahora el arma al dejar de ser disparada rotará en el sentido horizontal más cercano a la ultima posición en la que fue disparado, es un pequeño detalle pero hace que ver al personaje sealgo mucho más agradable.
+When the player stops shooting, the weapon now rotates to the horizontal direction closest to the last angle it was fired at. It is a small detail, but it makes the character much more pleasant to look at.
 
-### Modificación en las fisicas:
+### Physics changes
 
-Ahora el personaje cae más rapido y salta menos alto, esto para agregar algunas limitaciones al personaje y que el ataque de los enemigos sea un verdadero reto evadirlo.
+The character now falls faster and jumps lower. This adds some limitations to the character and makes dodging enemy attacks a real challenge.
 
-### Version Android y Touch
+### Android version and touch controls
 
-Para crear la version Android tuve que modificar cómo funcionaban los input (en todo lo que usara input), y lo centralice en PlayerInputs.cs este se encarga de regresar el estado de cada uno de los inputs, y retorna los inputs según el systema activo, cuando se reconoce algun touch, activa el systema touch, y cuando se reconoce alguna tecla activa el system de teclado y mouse
+To create the Android version, I had to change how input worked (everywhere input was used) and centralized it in PlayerInputs.cs. This class returns the state of each input according to the active system. When it detects a touch, it switches to the touch system, and when it detects a key press, it switches to the keyboard and mouse system.
 
-Para crear los systemas cree primero PlayerInputHandler que es la base abstracta sobre la que los otros systemas se crearán, luego cree KeyboardAndMouseInputHandler, y re-mapee con cada uno de los inputos que estaba usando anteriormente, el reto fue al crear TouchInputHandler.cs, pues este se encarga de responder las mismas peticiones pero desde los touch, este funciona reconociendo la mitad izquierda de la pantalla como espacio para touch de movimiento, la parte derecha para touch de disparo (a menos que esté tocando el boton salto) y con un botón de salto se gestiona el inicio y fin del salto.
+To build these systems, I first created PlayerInputHandler, the abstract base the other systems are built on. Then I created KeyboardAndMouseInputHandler and remapped every input I had been using before. The real challenge was TouchInputHandler.cs, which has to answer the same requests but from touch input. It treats the left half of the screen as the movement touch area and the right half as the shooting touch area (unless the player is touching the jump button), and a jump button handles the start and end of the jump.
 
-### Disparo Cargado
+### Charged shot
 
-Ahora el personaje puede cargar su disparo y con un sistema de mascaras se visualiza la cantidad de carga del disparo, esta potencia aumenta y disminuye de acuerdo a la cantidad de tiempo que lleve oprimido el click, de esta forma podemos tener disparos cercano o lejanos según la estrategia del jugador, todo con un solo click.
+The character can now charge their shot, and a mask-based system displays the current charge level. The shot's power rises and falls depending on how long the click is held down, so the player can fire short or long shots depending on their strategy, all with a single click.
 
-Así mismo, es disparado un proyectil que va cambiando su rotación según la velocidad y dirección, que a su mismo tiempo se va modificando tambien por la gravedad, así que los disparos son notoriamente curvos, similar a Worms.
+The projectile changes its rotation according to its velocity and direction, which are also affected by gravity, so the shots follow a noticeably curved path, similar to Worms.
 
-Esto lo logramos al combinar ShootingController con BasicBullet (la clase que lleva en su interior el disparo), ShootingController se encarga de hacer todos los calculos pertinentes al disparo, (el poder disparar o no está controlado por cada sub estado en el MachineState),
+This is achieved by combining ShootingController with BasicBullet (the class that holds the projectile itself). ShootingController handles all the calculations related to shooting (whether the character can shoot or not is controlled by each sub-state in the state machine).
 
-Cuando el disparo colisiona con algo, revisa si tiene el Layer Enviroment, si es así spawnea particulas de explosion y se auto destruye, si por el contrario choca con un enemigo, entonces spawnea particulas de sangre, busca el LifeController en el enemigo, invoka el TakeDamange y se auto destruye.
+When the projectile collides with something, it checks whether that object is on the Environment layer. If so, it spawns explosion particles and destroys itself. If it hits an enemy instead, it spawns blood particles, looks for the LifeController on the enemy, calls TakeDamage and destroys itself.
 
-Esto es super importante, porque significa que los disparos pueden interactuar con cualquier objeto que tenga LifeController y (en el caso del BasicBullet) esté en el layer Enemy, con el Tag Enemy, algo que usaremos tambien para destruir objetos en el escenario como las cajas.
+This is very important, because it means projectiles can interact with any object that has a LifeController and (in the case of BasicBullet) is on the Enemy layer with the Enemy tag. I also use this to destroy objects in the level, such as boxes.
 
-### Objetos que cambian el estado
+### State-changing pickups
 
-Existen dos tipos de objetos que se pueden recoger, Healt que sería para aumentar la salud, y Munition para aumentar la municíon.
+There are two types of pickups: Health, which increases health, and Munition, which increases ammo.
 
-En el caso de Healt, realmente lo que hace es al estilo de Mario Bross realizar un cambio en el personaje poniendolo verde y agregandole un gorrito, esto simboliza que tenemos dos puntos de vida que es el maximo, si somos golpeados perdemos el gorrito y el color verde, simbolizando que regresamos de nuevo a un punto de vida.
+Health works in the style of Super Mario Bros: it changes the character's appearance, turning them green and adding a little cap. This means we have two hit points, which is the maximum. If we get hit, we lose the cap and the green color, meaning we are back to one hit point.
 
-Munition por otro lado, es la forma principal por la cual obtenemos munición en el juego, este item nos permite aumentar la cantidad de munición de nuestra arma en 5, nuestra munición actual la podemos evidenciar todo el tiempo en la parte superior izquierda de la interfaz.
+Munition, on the other hand, is the main way to get ammo in the game. This item increases the weapon's ammo by 5, and the current ammo count is always visible in the top-left corner of the UI.
 
-Cada vez que disparamos el personaje hace una pequeña animación donde hace el arma pequeña (mientras esta está en rojo), esta se hace grande nuevamente si el personaje aun tiene munición para disparar, llegado el caso de no haber más munición el arma se quedara pequeña hasta encontrar nueva munición, esta parte es controlada tambien por **ShootingController.cs**
+Every time the character shoots, the weapon plays a small animation where it shrinks (and turns red). It grows back if the character still has ammo. If there is no ammo left, the weapon stays small until the player finds more. This is also controlled by **ShootingController.cs**.
 
-Sin embargo, para poder acceder a estos items, debemos romper las cajas que encontramos a lo largo del nivel, estas se distinguen entre 4
+However, to get these items, the player has to break the boxes scattered throughout the level. There are 4 types:
 
-La primera es, BoxItem, esta es simplemente una caja que se rompe, puede romperse saltando sobre ella o con un disparo, es la base para las otras cajas.
+The first is BoxItem, simply a box that breaks. It can be broken by jumping on it or by shooting it, and it is the base for the other boxes.
 
-La segunda sería BoxHealt que al momento de ser destruida deja en su lugar un item Healt.
+The second is BoxHealth, which leaves a Health item behind when destroyed.
 
-La tercera es BoxMunition que al ser destruida deja munición.
+The third is BoxMunition, which leaves ammo behind when destroyed.
 
-y por ultimo está la BoxNonDestructible, que cómo su nombre lo indica no es posible destruirla. esta la cree para crear pequeños mini puzzles donde las cajas con items están bajo cajas indestructibles, para ver cómo el jugador se ingenia mover las cajas y obtener los items.
+Finally, there is BoxNonDestructible, which, as the name suggests, cannot be destroyed. I created it to build small puzzles where boxes with items are trapped under indestructible boxes, to see how the player figures out how to move the boxes and get the items.
 
-### CheckPoints Y SaveStates
+### Checkpoints and save states
 
-Para hablar de los CheckPoints primero tenemos que hablar del sistema de guardado, y registro, de esto se encarga SaveSystem.cs una clase que cree en un inicio cómo Monobehaviour, pero a medida que avance con el proyecto, me di cuenta que necesitaba que esto fuera un poco más independiente de las escenas, y no quería crear un objeto persistente, así que decidí hacer la clase enteramente estatica.
+To talk about checkpoints, I first need to talk about the save and tracking system. This is handled by SaveSystem.cs, a class I originally created as a MonoBehaviour. As the project progressed, I realized it needed to be more independent from the scenes, and I did not want to create a persistent object, so I decided to make the class entirely static.
 
-Este se encarga de crear el archivo y el directorio, y guarda la partida en formato Json, para guardar la partida en diferentes slots cree estas dos estructuras de datos serializadas:
+It takes care of creating the file and directory and saves the game in JSON format. To save the game in different slots, I created these two serializable data structures:
 
-Por ahora en el juego solo vi pertinente guardar la posición de guardado (debido a que solo tengo un nivel), sin embargo, si necesitara ma inforación solo tendría que modificar el SaveData
+For now, I only saw the need to save the checkpoint position (since there is only one level), but if I needed more information I would only have to modify SaveData.
 
-El Checkpoint por otra parte es mucho más simple, (aunque tiene una animación bonita), simplemente es un trigger que al colisionar con el player envia la orden al SaveSystem de guardar esa posición, esto resumiendolo.
+The checkpoint itself is much simpler (although it has a nice animation). In short, it is a trigger that, when it collides with the player, tells the SaveSystem to save that position.
 
-### Sonidos!!
+### Sounds!
 
-Para el sistema de sonidos me inspiré un poco en el sistema de guardado, así que es un sistema semi estatico, pues lo estatico es su Instancía, y atraves de ella se puede acceder a cualquiera de sus acciones, para organizar cada uno de los sonidos posibles, cree un enum con cada uno de ellos.
+For the sound system, I took some inspiration from the save system, so it is a semi-static system: its instance is static, and through it you can access any of its actions. To organize all the possible sounds, I created an enum listing each of them.
 
-Luego en la clase agregué referencias a cada uno de los audio clips y el audio source, y luego en el metodo PlayAudio con e uso de un Swich reproduzco el sonido acorde a la elección.
+Then I added references to each audio clip and the audio source in the class, and in the PlayAudio method I use a switch to play the sound that matches the selection.
 
-Acá un ejemplo de cómo se usa:
 
-### Nuevos Enemigos
+### New enemies
 
-Ahora hay en teoría tres nuevas variantes de enemigos (debido a que el enemigo base tambien fue modificado)
+There are now, in theory, three new enemy variants (since the base enemy was also modified).
 
-Primero tenemos el enemigo base, su rango se aumentó, y se le agregó una nueva capacidad, la de saltar, pero no solo salta de forma aleatoría, salta según la situación en la que se encuentre (por si está bloqueado) y si reconoce que el jugador está en una parte superior a el, de esta forma puede escalar, e incluso escalar apilandose los unos a los otros, toda la información de como funciona está en sus StateMachine
+First is the base enemy. Its range was increased, and it gained a new ability: jumping. It does not just jump at random; it jumps depending on its situation (for example, when it is blocked) and when it detects that the player is above it. This lets it climb, and enemies can even climb by stacking on top of each other. All the details of how it works are in its StateMachine.
 
-En segundo lugar tenemos el enemigo rosa, este es más rapido y a diferencia del anterior que dejara de saltar si se encuentra en el mismo nivel que el jugador (de altura), este seguirá dando pequeños saltos aun así, de esta forma dispararle es mucho más dificil, y es mucho más peligroso, es un pequeño cambio pero afecta bastante la jugabilidad.
+Second is the pink enemy. It is faster, and unlike the base enemy, which stops jumping when it is at the same height as the player, it keeps doing small hops anyway. This makes it much harder to shoot and much more dangerous. It is a small change, but it affects the gameplay quite a bit.
 
-En tercer lugar tenemos el enemigo amarillo, este es completamente distinto a los anteriores, aunque tambien puede ser vencido saltandole encima, este toma distancia del jugador y se mantiene a cierta distancia, cuando se le dispara trata de evadir el disparo, y luego de unos segundos se avalanza a atacar al usuario de forma rapida para luego regresar a una posición defensiva.
+Third is the yellow enemy, which is completely different from the others. Although it can also be defeated by jumping on it, it keeps its distance from the player. When shot at, it tries to dodge the projectile, and after a few seconds it quickly lunges at the player before returning to a defensive position.
 
-Y por ultimo tendríamos al **enemigo final**, este está programado de forma totalmente distinta, Todo su codigo se encuentra en FinalBoss.cs, pero en resumen lo que hace es esperar hasta que un trigger cerca a el indica que debe iniciarse la batalla, en este momento el enemigo baja a un nivel donde es posible dispararle, y empieza a liberar objetos de forma aleatoria, puede liberar objetos cómo municion o salud, cómo tambien liberar enemigos del tipo basico o rosa (no agregué amarillo porque pensé que seria muy dificil), al derrotarlo el enemigo se auto destruirá con algunas particulas, sonará el sonido de victoria, y el jugador será recogido nuevamente por el helicoptero, mostrando la pantalla de victoria
+Finally, there is the **final boss**, which is programmed in a completely different way. All of its code is in FinalBoss.cs. In short, it waits until a nearby trigger signals that the battle should begin. At that moment the boss drops down to a height where it can be shot and starts releasing objects at random. It can drop items such as ammo or health, and it can also release basic or pink enemies (I did not add yellow ones because I thought it would be too hard). When defeated, the boss self-destructs with some particles, the victory sound plays, and the player is picked up again by the helicopter, showing the victory screen.
 
-### UI Mejorada
+### Improved UI
 
-Remplace las tipografías, los textos, los botones, los estilos, re organice todo, y mejoré el estilo de cada una de estas interfaces, cómo tambien agregué el el poder acceder a diferentes partidas guardads.
+I replaced the fonts, texts, buttons and styles, reorganized everything, and improved the look of each screen. I also added the ability to access different saved games.
 
-## Lo Antiguo:
+## The original version
 
 ![Game: BitDroid](./ext-9ae84cca2d.png)
 
-Lo he creado teniendo en cuenta que pueda ser escalable, entnces cree un state machine basico que funcionará para todos los personajes (cuento como persnajes a enemigos y al jugador), pero cada uno creará su propia implementación, por ejemplo el jugador dicta el movimiento según el sistema de input (he usado el nuevo sistema de Input para esta implementacion), mientras que los enemigos dictan su movimiento por triggers que reconocen el jugador
+I built it with scalability in mind, so I created a basic state machine that works for all characters (I count both enemies and the player as characters), while each one creates its own implementation. For example, the player's movement is driven by the input system (I used the new Input System for this implementation), while enemies' movement is driven by triggers that detect the player.
 
 ![Game: BitDroid](./ext-ab879704b3.png)
 
-El State machine es gerarquico, así que primero pasa entre estados Root, como: grounded, Jump, y Airborn, y estos estados al entrar asignan sub estados de segunda categoría segun las variables que hay en el contexto (el contecto es el state machine), estos sub estados pueden sub asignarse tambien su estados, por eso algunso sub estados a su vez se asignan el sub estado HorizontalMovment
+The state machine is hierarchical. It first moves between root states such as Grounded, Jump and Airborne. When entered, these states assign second-level sub-states based on the variables in the context (the context is the state machine). These sub-states can also assign their own sub-states, which is why some sub-states in turn assign the HorizontalMovement sub-state.
 
 ![Game: BitDroid](./ext-7f95e4d4b3.png)
 
-El resto del funcionamiento es muy simple, solo cada uno (jugador y enemigos) crean sus variantes del state machine base, y crean sus propias implementaciones, la idea era que tambien crearan sus propios sub estados y state factory, pero al final no fue necesario implementarlo (pero sigue estando ahi para poder escalar el proyecto en un futuro)
+The rest is quite simple: each character (player and enemies) creates its own variant of the base state machine and its own implementations. The idea was that they would also create their own sub-states and state factory, but in the end that was not necessary (it is still there so the project can scale in the future).
 
 ![Game: BitDroid](./ext-51d88b5580.png)
 
 ![Game: BitDroid](./ext-72881a2331.png)
 
-Para la animación cree una clase llamada "CharacterAnimationController.cs" la cual los estads del state machine tienen cntrol, y envian diferentes cambios para el animator, el animator usados sub estados, para controlar las acciones de cuando el personaje está en el aire o en el suelo, (para el enemigos usé una copia de este mismo animator pero con animaciones del enemigo)
+For animation, I created a class called "CharacterAnimationController.cs", which the state machine states control, sending different changes to the Animator. The Animator uses sub-states to handle the actions for when the character is in the air or on the ground (for the enemies, I used a copy of the same Animator with the enemy animations).
 
-Para el escenario he usado un tilemap donode cree un tile dinamico que he usado para todo el escenario.
+For the level, I used a tilemap where I created a dynamic tile that I used for the entire level.
 
-## Assets usados:
+## Assets used
 
 [DoTween](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676)
-Para hacer transiciones rapidamente.
+For quick transitions.
 
 Cinemachine
-Para hacer controlar el movimiento de la camara.
+To control the camera movement.
 
 [Kenney 1bit Asset](https://kenney.nl/assets/1-bit-platformer-pack)
-He usado esta textura para crear todos los sprites usados.
+I used this texture pack to create all the sprites in the game.

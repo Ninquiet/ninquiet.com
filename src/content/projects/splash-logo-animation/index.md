@@ -11,6 +11,18 @@ featured: true
 order: 5
 ---
 
-Is the intro animation (the splash screen), it use custom shadders, vfx Graph, Timeline, DoTween and so much love.
+The intro animation that plays as the splash screen.
+
+## Problem
+
+The splash screen is the first thing people see, so it had to feel polished and on brand instead of a static logo.
+
+## Approach
+
+Custom shaders and VFX Graph build the visual layers, and Timeline plus DoTween choreograph the timing of the whole sequence.
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/kMRJZHad1RA" title="VFX: Splash Logo Animation video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
+
+## VR constraints
+
+It plays while the app is starting, so it has to look good without demanding much from the GPU, and in VR it needs to stay comfortable to watch.

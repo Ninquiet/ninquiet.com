@@ -9,6 +9,18 @@ video: "/media/force-zones-vr.webp"
 legacy: true
 ---
 
-This are some force zones that drags the player inside and moves them over the air direction, this are super cool because you can create your own system just using some of them together, making possible many different immersive experiences
+Force zones that pull the player in and carry them through the air in a chosen direction.
+
+## Problem
+
+Creators wanted more dynamic ways to move players around their worlds than walking and teleporting.
+
+## Approach
+
+Each zone drags the player inside it and moves them along the air direction. Zones can be combined, so creators can build their own systems out of several of them and create many different experiences.
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/oWufqkjh-GM" title="VFX-DEV: Force Zones VR video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
+
+## VR constraints
+
+Moving a player without their input is a common cause of motion sickness in VR, so this kind of movement has to stay smooth and predictable to remain comfortable.

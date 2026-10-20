@@ -14,129 +14,128 @@ links:
 legacy: true
 ---
 
-## Video:
+## Video
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/PQEoYr7PsSE" title="Game Test: INVASION ALIENIGENA video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
 
-## Build:
+## Build
 
-Puedes jugar el juego acá:
+You can play the game here:
 [https://simmer.io/@Ninquiet/invasionalienigena](https://simmer.io/@Ninquiet/invasionalienigena)
 
 Android APK:
 [https://drive.google.com/file/d/1WEzU8jH1y8nZuNBp5wpDoEjlWRb_Wts-/view?usp=sharing](https://drive.google.com/file/d/1WEzU8jH1y8nZuNBp5wpDoEjlWRb_Wts-/view?usp=sharing)
 
-## Resumen:
+## Summary
 
-Es un juego de plataformas, para moverte puedes usar WASD o las flechitas, para saltar usa la barra espaciadora, para entrar a menú pausa puedes usar la tecla Esc, y el mouse junto al click izquierdo para disparar, si tienes municiones claro.
+It's a platformer. You move with WASD or the arrow keys, jump with the space bar, open the pause menu with Esc, and aim with the mouse and left-click to shoot (as long as you have ammo, of course).
 
-puedes acabar con enemigos saltandoles encima, pero si estos te tocan morirás instantaneamente, tambien puedes caer al vacío y morir.
+You can defeat enemies by jumping on top of them, but if they touch you, you die instantly. You can also die by falling into the void.
 
-## Funcionamiento:
+## How it works
 
-## Lo nuevo:
+## What's new
 
-### Version Android y Touch
+### Android version and touch controls
 
-Para crear la version Android tuve que modificar cómo funcionaban los input (en todo lo que usara input), y lo centralice en PlayerInputs.cs este se encarga de regresar el estado de cada uno de los inputs, y retorna los inputs según el systema activo, cuando se reconoce algun touch, activa el systema touch, y cuando se reconoce alguna tecla activa el system de teclado y mouse
+To create the Android version, I had to change how input worked everywhere it was used, and I centralized it in PlayerInputs.cs. This class returns the state of each input according to the active system: when a touch is detected, it activates the touch system, and when a key press is detected, it activates the keyboard and mouse system.
 
-Para crear los systemas cree primero PlayerInputHandler que es la base abstracta sobre la que los otros systemas se crearán, luego cree KeyboardAndMouseInputHandler, y re-mapee con cada uno de los inputos que estaba usando anteriormente, el reto fue al crear TouchInputHandler.cs, pues este se encarga de responder las mismas peticiones pero desde los touch, este funciona reconociendo la mitad izquierda de la pantalla como espacio para touch de movimiento, la parte derecha para touch de disparo (a menos que esté tocando el boton salto) y con un botón de salto se gestiona el inicio y fin del salto.
+To build these systems, I first created PlayerInputHandler, the abstract base that the other systems are built on. Then I created KeyboardAndMouseInputHandler and remapped every input I had been using before. The real challenge was TouchInputHandler.cs, which has to answer the same requests but from touch input. It treats the left half of the screen as the movement touch area and the right half as the shooting touch area (unless the player is touching the jump button), and a jump button handles the start and end of the jump.
 
-### Disparo Cargado
+### Charged shot
 
-Ahora el personaje puede cargar su disparo y con un sistema de mascaras se visualiza la cantidad de carga del disparo, esta potencia aumenta y disminuye de acuerdo a la cantidad de tiempo que lleve oprimido el click, de esta forma podemos tener disparos cercano o lejanos según la estrategia del jugador, todo con un solo click.
+The character can now charge a shot, and a mask system shows how much charge it has. The power increases and decreases depending on how long the click is held, so the player can fire short or long shots depending on their strategy, all with a single click.
 
-Así mismo, es disparado un proyectil que va cambiando su rotación según la velocidad y dirección, que a su mismo tiempo se va modificando tambien por la gravedad, así que los disparos son notoriamente curvos, similar a Worms.
+The projectile also changes its rotation according to its velocity and direction, which are in turn affected by gravity, so shots follow a noticeably curved path, similar to Worms.
 
-Esto lo logramos al combinar ShootingController con BasicBullet (la clase que lleva en su interior el disparo), ShootingController se encarga de hacer todos los calculos pertinentes al disparo, (el poder disparar o no está controlado por cada sub estado en el MachineState),
+I achieved this by combining ShootingController with BasicBullet (the class that contains the projectile). ShootingController handles all the calculations for the shot (whether the player can shoot or not is controlled by each substate in the MachineState).
 
-Cuando el disparo colisiona con algo, revisa si tiene el Layer Enviroment, si es así spawnea particulas de explosion y se auto destruye, si por el contrario choca con un enemigo, entonces spawnea particulas de sangre, busca el LifeController en el enemigo, invoka el TakeDamange y se auto destruye.
+When the projectile collides with something, it checks whether that object is on the Environment layer. If so, it spawns explosion particles and destroys itself. If it hits an enemy instead, it spawns blood particles, finds the enemy's LifeController, calls TakeDamage, and destroys itself.
 
-Esto es super importante, porque significa que los disparos pueden interactuar con cualquier objeto que tenga LifeController y (en el caso del BasicBullet) esté en el layer Enemy, con el Tag Enemy, algo que usaremos tambien para destruir objetos en el escenario como las cajas.
+This is very important, because it means shots can interact with any object that has a LifeController and (in the case of BasicBullet) is on the Enemy layer with the Enemy tag. I also use this to destroy objects in the level, such as boxes.
 
-### Objetos que cambian el estado
+### Items that change the player's state
 
-Existen dos tipos de objetos que se pueden recoger, Healt que sería para aumentar la salud, y Munition para aumentar la municíon.
+There are two kinds of collectible items: Health, which increases health, and Munition, which increases ammo.
 
-En el caso de Healt, realmente lo que hace es al estilo de Mario Bross realizar un cambio en el personaje poniendolo verde y agregandole un gorrito, esto simboliza que tenemos dos puntos de vida que es el maximo, si somos golpeados perdemos el gorrito y el color verde, simbolizando que regresamos de nuevo a un punto de vida.
+Health actually works in a Mario Bros. style: it changes the character, turning them green and adding a little hat. This shows that you have two hit points, which is the maximum. If you get hit, you lose the hat and the green color, meaning you are back to one hit point.
 
-Munition por otro lado, es la forma principal por la cual obtenemos munición en el juego, este item nos permite aumentar la cantidad de munición de nuestra arma en 5, nuestra munición actual la podemos evidenciar todo el tiempo en la parte superior izquierda de la interfaz.
+Munition, on the other hand, is the main way to get ammo in the game. This item increases the weapon's ammo by 5, and your current ammo is always visible in the top-left corner of the UI.
 
-Cada vez que disparamos el personaje hace una pequeña animación donde hace el arma pequeña (mientras esta está en rojo), esta se hace grande nuevamente si el personaje aun tiene munición para disparar, llegado el caso de no haber más munición el arma se quedara pequeña hasta encontrar nueva munición, esta parte es controlada tambien por **ShootingController.cs**
+Every time you shoot, the character plays a small animation where the weapon shrinks (while it turns red). It grows back if the character still has ammo; if there is no ammo left, the weapon stays small until you find more. This is also controlled by **ShootingController.cs**.
 
-Sin embargo, para poder acceder a estos items, debemos romper las cajas que encontramos a lo largo del nivel, estas se distinguen entre 4
+However, to reach these items, you have to break the boxes found throughout the level. There are four types:
 
-La primera es, BoxItem, esta es simplemente una caja que se rompe, puede romperse saltando sobre ella o con un disparo, es la base para las otras cajas.
+The first is BoxItem, a box that simply breaks. It can be broken by jumping on it or by shooting it, and it is the base for the other boxes.
 
-La segunda sería BoxHealt que al momento de ser destruida deja en su lugar un item Healt.
+The second is BoxHealth, which leaves a Health item behind when it is destroyed.
 
-La tercera es BoxMunition que al ser destruida deja munición.
+The third is BoxMunition, which leaves ammo behind when it is destroyed.
 
-y por ultimo está la BoxNonDestructible, que cómo su nombre lo indica no es posible destruirla. esta la cree para crear pequeños mini puzzles donde las cajas con items están bajo cajas indestructibles, para ver cómo el jugador se ingenia mover las cajas y obtener los items.
+Finally, there is BoxNonDestructible, which, as the name suggests, cannot be destroyed. I created it to build small puzzles where boxes with items sit under indestructible boxes, to see how the player figures out how to move the boxes and get the items.
 
-### CheckPoints Y SaveStates
+### Checkpoints and save states
 
-Para hablar de los CheckPoints primero tenemos que hablar del sistema de guardado, y registro, de esto se encarga SaveSystem.cs una clase que cree en un inicio cómo Monobehaviour, pero a medida que avance con el proyecto, me di cuenta que necesitaba que esto fuera un poco más independiente de las escenas, y no quería crear un objeto persistente, así que decidí hacer la clase enteramente estatica.
+To talk about checkpoints, I first have to talk about the save and record-keeping system. This is handled by SaveSystem.cs, a class I originally created as a MonoBehaviour. As the project progressed, I realized I needed it to be more independent of the scenes, and I didn't want to create a persistent object, so I decided to make the class entirely static.
 
-Este se encarga de crear el archivo y el directorio, y guarda la partida en formato Json, para guardar la partida en diferentes slots cree estas dos estructuras de datos serializadas:
+It creates the save file and directory and stores the game in JSON format. To save games in different slots, I created these two serialized data structures:
 
-Por ahora en el juego solo vi pertinente guardar la posición de guardado (debido a que solo tengo un nivel), sin embargo, si necesitara ma inforación solo tendría que modificar el SaveData
+For now, I only saw the need to save the checkpoint position (since there is only one level), but if I needed more information, I would only have to modify SaveData.
 
-El Checkpoint por otra parte es mucho más simple, (aunque tiene una animación bonita), simplemente es un trigger que al colisionar con el player envia la orden al SaveSystem de guardar esa posición, esto resumiendolo.
+The checkpoint, on the other hand, is much simpler (although it has a nice animation). In short, it is a trigger that, when it collides with the player, tells the SaveSystem to save that position.
 
-### Sonidos!!
+### Sounds!
 
-Para el sistema de sonidos me inspiré un poco en el sistema de guardado, así que es un sistema semi estatico, pues lo estatico es su Instancía, y atraves de ella se puede acceder a cualquiera de sus acciones, para organizar cada uno de los sonidos posibles, cree un enum con cada uno de ellos.
+For the sound system, I took some inspiration from the save system, so it is semi-static: the instance is static, and any of its actions can be accessed through it. To organize all the possible sounds, I created an enum listing each one.
 
-Luego en la clase agregué referencias a cada uno de los audio clips y el audio source, y luego en el metodo PlayAudio con e uso de un Swich reproduzco el sonido acorde a la elección.
+Then I added references to each audio clip and to the audio source in the class, and in the PlayAudio method I use a switch to play the selected sound.
 
-Acá un ejemplo de cómo se usa:
 
-### Nuevos Enemigos
+### New enemies
 
-Ahora hay en teoría tres nuevas variantes de enemigos (debido a que el enemigo base tambien fue modificado)
+There are now, in theory, three new enemy variants (since the base enemy was also modified).
 
-Primero tenemos el enemigo base, su rango se aumentó, y se le agregó una nueva capacidad, la de saltar, pero no solo salta de forma aleatoría, salta según la situación en la que se encuentre (por si está bloqueado) y si reconoce que el jugador está en una parte superior a el, de esta forma puede escalar, e incluso escalar apilandose los unos a los otros, toda la información de como funciona está en sus StateMachine
+First, the base enemy: its range was increased and it gained a new ability, jumping. It doesn't just jump randomly; it jumps depending on its situation (for example, if it is blocked) and when it detects that the player is above it. This lets it climb, and enemies can even climb by stacking on top of each other. All the details of how it works are in its state machine.
 
-En segundo lugar tenemos el enemigo rosa, este es más rapido y a diferencia del anterior que dejara de saltar si se encuentra en el mismo nivel que el jugador (de altura), este seguirá dando pequeños saltos aun así, de esta forma dispararle es mucho más dificil, y es mucho más peligroso, es un pequeño cambio pero afecta bastante la jugabilidad.
+Second, the pink enemy is faster. Unlike the base enemy, which stops jumping when it is at the same height as the player, this one keeps making small jumps, which makes it much harder to shoot and much more dangerous. It is a small change, but it has a big impact on gameplay.
 
-En tercer lugar tenemos el enemigo amarillo, este es completamente distinto a los anteriores, aunque tambien puede ser vencido saltandole encima, este toma distancia del jugador y se mantiene a cierta distancia, cuando se le dispara trata de evadir el disparo, y luego de unos segundos se avalanza a atacar al usuario de forma rapida para luego regresar a una posición defensiva.
+Third, the yellow enemy is completely different from the others. Although it can also be defeated by jumping on it, it keeps a certain distance from the player. When shot at, it tries to dodge, and after a few seconds it quickly lunges at the player and then returns to a defensive position.
 
-Y por ultimo tendríamos al **enemigo final**, este está programado de forma totalmente distinta, Todo su codigo se encuentra en FinalBoss.cs, pero en resumen lo que hace es esperar hasta que un trigger cerca a el indica que debe iniciarse la batalla, en este momento el enemigo baja a un nivel donde es posible dispararle, y empieza a liberar objetos de forma aleatoria, puede liberar objetos cómo municion o salud, cómo tambien liberar enemigos del tipo basico o rosa (no agregué amarillo porque pensé que seria muy dificil), al derrotarlo el enemigo se auto destruirá con algunas particulas, sonará el sonido de victoria, y el jugador será recogido nuevamente por el helicoptero, mostrando la pantalla de victoria
+Finally, there is the **final boss**, which is programmed in a completely different way. All of its code is in FinalBoss.cs. In short, it waits until a nearby trigger signals that the battle should start. At that point, the boss moves down to a level where it can be shot and starts releasing random objects: items such as ammo or health, as well as basic or pink enemies (I didn't include yellow ones because I thought it would be too hard). When defeated, the boss self-destructs with some particles, the victory sound plays, and the helicopter picks up the player again, showing the victory screen.
 
-### UI Mejorada
+### Improved UI
 
-Remplace las tipografías, los textos, los botones, los estilos, re organice todo, y mejoré el estilo de cada una de estas interfaces, cómo tambien agregué el el poder acceder a diferentes partidas guardads.
+I replaced the fonts, texts, buttons, and styles, reorganized everything, and improved the look of each screen. I also added the ability to access different saved games.
 
-## Lo Antiguo:
+## Original version
 
 ![Game Test: INVASION ALIENIGENA](./ext-9ae84cca2d.png)
 
-Lo he creado teniendo en cuenta que pueda ser escalable, entnces cree un state machine basico que funcionará para todos los personajes (cuento como persnajes a enemigos y al jugador), pero cada uno creará su propia implementación, por ejemplo el jugador dicta el movimiento según el sistema de input (he usado el nuevo sistema de Input para esta implementacion), mientras que los enemigos dictan su movimiento por triggers que reconocen el jugador
+I built it with scalability in mind, so I created a basic state machine that works for all characters (I count both the enemies and the player as characters), while each one creates its own implementation. For example, the player's movement is driven by the input system (I used the new Input System for this implementation), while the enemies' movement is driven by triggers that detect the player.
 
 ![Game Test: INVASION ALIENIGENA](./ext-ab879704b3.png)
 
-El State machine es gerarquico, así que primero pasa entre estados Root, como: grounded, Jump, y Airborn, y estos estados al entrar asignan sub estados de segunda categoría segun las variables que hay en el contexto (el contecto es el state machine), estos sub estados pueden sub asignarse tambien su estados, por eso algunso sub estados a su vez se asignan el sub estado HorizontalMovment
+The state machine is hierarchical. It first moves between root states such as Grounded, Jump, and Airborne. When entered, these states assign second-level substates based on the variables in the context (the context is the state machine). These substates can also assign their own substates, which is why some of them assign the HorizontalMovement substate.
 
 ![Game Test: INVASION ALIENIGENA](./ext-7f95e4d4b3.png)
 
-El resto del funcionamiento es muy simple, solo cada uno (jugador y enemigos) crean sus variantes del state machine base, y crean sus propias implementaciones, la idea era que tambien crearan sus propios sub estados y state factory, pero al final no fue necesario implementarlo (pero sigue estando ahi para poder escalar el proyecto en un futuro)
+The rest is very simple: each character (player and enemies) creates its own variant of the base state machine with its own implementation. The idea was for them to also create their own substates and state factory, but in the end that wasn't necessary (it is still there so the project can scale in the future).
 
 ![Game Test: INVASION ALIENIGENA](./ext-51d88b5580.png)
 
 ![Game Test: INVASION ALIENIGENA](./ext-72881a2331.png)
 
-Para la animación cree una clase llamada "CharacterAnimationController.cs" la cual los estads del state machine tienen cntrol, y envian diferentes cambios para el animator, el animator usados sub estados, para controlar las acciones de cuando el personaje está en el aire o en el suelo, (para el enemigos usé una copia de este mismo animator pero con animaciones del enemigo)
+For animation, I created a class called "CharacterAnimationController.cs", which the state machine's states control by sending different changes to the animator. The animator uses substates to handle actions when the character is in the air or on the ground (for the enemies, I used a copy of the same animator with the enemy animations).
 
-Para el escenario he usado un tilemap donode cree un tile dinamico que he usado para todo el escenario.
+For the level, I used a tilemap where I created a dynamic tile that I used for the entire level.
 
-## Assets usados:
+## Assets used
 
 [DoTween](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676)
-Para hacer transiciones rapidamente.
+For quick transitions.
 
 Cinemachine
-Para hacer controlar el movimiento de la camara.
+For controlling camera movement.
 
 [Kenney 1bit Asset](https://kenney.nl/assets/1-bit-platformer-pack)
-He usado esta textura para crear todos los sprites usados.
+I used this texture to create all the sprites.

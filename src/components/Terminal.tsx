@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { LEVEL_EVENT } from '../lib/levelTransition';
+import { PROFILE } from '../data/profile';
 import { applyPalette, isPalette } from '../lib/palette';
 import { complete, execute } from '../lib/terminal/shell';
 import type { Line, ProjectEntry, Segment, TerminalContext } from '../lib/terminal/types';
@@ -62,6 +63,12 @@ export default function Terminal({ projects, intro = 'whoami' }: Props) {
       if (output === 'clear') {
         setLines([]);
         return;
+      }
+      if (command.toLowerCase() === 'cv') {
+        const a = document.createElement('a');
+        a.href = PROFILE.cv;
+        a.download = PROFILE.cvFileName;
+        a.click();
       }
       setLines((prev) => [...prev, echo, ...output].slice(-MAX_LINES));
     },

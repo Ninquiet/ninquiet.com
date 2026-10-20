@@ -9,8 +9,18 @@ video: "/media/spawn-unspawn-worlds.webp"
 legacy: true
 ---
 
-I've created this effect for when the world spheres appears and disappears. is a VFX created mixing shaders, Visual VFX Graph, and DoTween.
+The effect that plays when the world spheres appear and disappear.
 
-Is specially done for VR on URP and on Single Pass
+## Problem
+
+Spheres popping in and out felt abrupt. They needed a clear, satisfying transition that tells the player something is being created or removed.
+
+## Approach
+
+A mix of custom shaders, VFX Graph, and DoTween animations choreographs the appear and disappear sequence.
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/pjUctyUWRG4" title="VFX: Spawn-Unpawn Worlds video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
+
+## VR constraints
+
+Built specifically for VR on URP with Single Pass rendering, so the shaders and particles had to be compatible with single pass stereo and render correctly in both eyes in one pass.

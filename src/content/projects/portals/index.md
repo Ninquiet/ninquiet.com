@@ -11,10 +11,22 @@ featured: true
 order: 6
 ---
 
-This is a portals system that interconnects all the metaverse, I created it creating a complex system of cameras that renders a texture on different positions, and teleports the player according to certain conditions (mixing with it custom shaders and some other VFX thicks :3 )
+A portal system that connects the different worlds of a metaverse: you see the destination through the portal in real time and step through it to travel.
+
+## Problem
+
+Players needed to move between worlds without a loading screen breaking immersion, and the portal had to look like a real window into the other place, not a flat picture.
+
+## Approach
+
+A multi-camera setup renders the destination view from the right position into a texture shown on the portal surface. Custom shaders and VFX dress the frame, and the player is teleported once they cross the portal under the right conditions.
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/2QOjH1y26Dw" title="VFX-DEV: Portals video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
 
-This is the first version of the portals that I've created:
+## VR constraints
+
+Every portal is an extra camera render, and in VR the view also has to look right for each eye, so the number of active views and their resolution must stay under control to keep the frame rate stable.
+
+This is the first version of the portals I built:
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/8T9byXMk9yc" title="VFX-DEV: Portals video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>

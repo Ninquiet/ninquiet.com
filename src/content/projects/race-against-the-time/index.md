@@ -14,47 +14,47 @@ legacy: true
 
 ![Game: Race Against the time](./ext-b665b48639.png)
 
-## Video:
+## Video
 
 <div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/yhKHteLQ37M" title="Game: Race Against the time video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" loading="lazy"></iframe></div>
 
-## Build:
+## Build
 
-Puedes jugar el juego acá:
+You can play the game here:
 [https://simmer.io/@Ninquiet/carrera-contra-reloj-v1-pec1](https://simmer.io/@Ninquiet/carrera-contra-reloj-v1-pec1)
 
-## Resumen:
+## Summary
 
-Es un juego de carreras en el qué puedes correr contra ti mismo, el funcionamiento es simple, solo necesitas las WASD para moverte, y Space Bar para frenar
+It's a racing game where you can race against yourself. The controls are simple: WASD to move and the space bar to brake.
 
-**Todos los Assets los he creado yo, las texturas las hice con photoshop y el personaje lo cree con primitvas**
+**I created all the assets myself: I made the textures in Photoshop and built the character from primitives.**
 
-Cree tambien mi propio sistema para grabar y reproducir las grabaciones (es una version personalizada :3 )
+I also created my own system for recording and replaying runs (it's a custom version).
 
-## Funcionamiento:
+## How it works
 
 ![Game: Race Against the time](./ext-eff55df9f2.png)
 
-### Game:
+### Game
 
-El principal es GamePlayeControl (que se encarga de organizar el inicio transicion y final de la partida), luego está GameUIController (que controla todo lo relacionado a UI), y por ultimo GameTrigger, que es el componente usado para tener un tracking de cuando el usuario pasa pro ciertas parrtes o no).
+The main component is GameplayControl, which organizes the start, transition, and end of the match. Then there is GameUIController, which handles everything related to the UI, and finally GameTrigger, the component used to track whether the player passes through certain parts of the track.
 
-### CarControl:
+### CarControl
 
-Compuesto de CarController.cs, es el que se encarga del movimiento del carro (lo he personalizado un poco)
+Made up of CarController.cs, which handles the car's movement (I customized it a bit).
 
-### CarRecord:
+### CarRecord
 
-Compuesto de CarRecordData (Serializable donde se guarda la informacion) CarRecordManager (que es el que gestiona cuando grabar y cuando reproducir) RecordLogger (encargado de grabar lo snapshots) RecordPlayer (encargado de reproducir los snapshots), y RecordModuleBase, que es la clase abstracta base para el logger y el RecordPlayer
+Made up of CarRecordData (a serializable class where the data is stored), CarRecordManager (which decides when to record and when to play back), RecordLogger (which records the snapshots), RecordPlayer (which plays back the snapshots), and RecordModuleBase, the abstract base class for RecordLogger and RecordPlayer.
 
-### CameraDirector:
+### CameraDirector
 
-Compuesto unicamente por GameCameraDirector.cs es el encargado de controlar que tipo de camara se usará, así, cuando el juego termina, este al estar conectado con un evento en GameplayControl es notificado, y empieza a cambiar entre diferentes camaras. para esto he usado CineMachine para tener un mejor acabado
+Made up only of GameCameraDirector.cs, which controls which camera is used. It is connected to an event in GameplayControl, so when the game ends, it gets notified and starts switching between different cameras. I used Cinemachine for this to get a more polished result.
 
-## Assets usados:
+## Assets used
 
 [Free Trees](https://assetstore.unity.com/packages/3d/vegetation/trees/free-trees-103208)
-Para agregar arboles (debido a que estoy usando URP)
+To add trees (since I'm using URP).
 
 [DoTween](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676)
-Para hacer transiciones rapidamente.
+For quick transitions.
