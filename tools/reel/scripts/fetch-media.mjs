@@ -14,6 +14,7 @@ const local = {
   'assets/jelly-shader.mp4': 'public/media/jelly-shader.mp4',
   'assets/tinyagentoffice.mp4': 'public/media/tinyagentoffice.mp4',
   'assets/canvas-bend-points.mp4': 'public/media/canvas-bend-points.mp4',
+  'assets/swingi-bois-gameplay.mp4': 'public/media/swingi-bois-gameplay.mp4',
   'assets/gpts.jpg': 'src/content/projects/custom-gpts/cover.jpg',
   'assets/unity-essentials.jpg': 'src/content/projects/unity-essentials/cover.jpg',
 };
