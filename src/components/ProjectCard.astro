@@ -1,7 +1,7 @@
 ---
 import { Image, getImage } from 'astro:assets';
 import { CATEGORY_LABELS } from '../data/categories';
-import { fileName, permissions, type Project } from '../lib/projects';
+import { fileName, isAnimatedImage, permissions, type Project } from '../lib/projects';
 
 interface Props {
   project: Project;
@@ -17,7 +17,9 @@ const poster = video && cover ? (await getImage({ src: cover, width: 720, format
 <a class:list={['card', { compact }]} href={`/projects/${project.id}/`} data-category={category}>
   <div class="media">
     {
-      video ? (
+      video && isAnimatedImage(video) ? (
+        <img src={video} alt="" loading="lazy" decoding="async" />
+      ) : video ? (
         <video src={video} poster={poster} muted loop playsinline preload="none" data-autoplay aria-hidden="true" />
       ) : cover ? (
         <Image src={cover} alt="" widths={[360, 720]} sizes="(max-width: 700px) 100vw, 360px" loading="lazy" />

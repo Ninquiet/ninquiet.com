@@ -4,7 +4,7 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { CATEGORY_LABELS } from '../../data/categories';
 import ProjectCard from '../../components/ProjectCard.astro';
-import { fileName, getProjects, permissions, relatedProjects, type Project } from '../../lib/projects';
+import { fileName, getProjects, isAnimatedImage, permissions, relatedProjects, type Project } from '../../lib/projects';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -56,7 +56,11 @@ const poster = video && cover ? (await getImage({ src: cover, width: 1120, forma
       }
     </header>
 
-    {video ? (
+    {video && isAnimatedImage(video) ? (
+      <figure class="cover">
+        <img src={video} alt={`${title} preview`} loading="eager" decoding="async" />
+      </figure>
+    ) : video ? (
       <figure class="cover">
         <video src={video} poster={poster} controls muted loop playsinline preload="metadata" data-autoplay />
       </figure>

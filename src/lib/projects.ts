@@ -15,6 +15,8 @@ export function pickForSection(projects: Project[], categories: string[], limit:
   return { shown: ordered.slice(0, limit), rest: Math.max(0, matching.length - limit) };
 }
 
+export const isAnimatedImage = (path: string) => /\.(webp|gif)$/i.test(path);
+
 export function relatedProjects(project: Project, all: Project[], count: number): Project[] {
   const rank = (p: Project) => (p.data.category === project.data.category ? 0 : 2) + (p.data.featured ? 0 : 1);
   return all

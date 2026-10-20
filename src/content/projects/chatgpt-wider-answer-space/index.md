@@ -5,6 +5,7 @@ category: tools
 tags: ["firefox add-on", "css"]
 summary: "A Firefox add-on that gives ChatGPT answers more horizontal room."
 license: "MPL-2.0"
+cover: "./cover.png"
 featured: false
 links:
   - label: "Firefox Add-ons"
