@@ -12,8 +12,6 @@ links:
   - label: "Android APK"
     url: "https://drive.google.com/file/d/1WEzU8jH1y8nZuNBp5wpDoEjlWRb_Wts-/view?usp=sharing"
 legacy: true
-featured: true
-order: 2
 ---
 
 ## Video:

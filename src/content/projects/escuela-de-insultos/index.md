@@ -27,7 +27,7 @@ links:
     url: "https://gitlab.com/Ninquiet/ninquietuoc-2d-pec1/-/wikis/uploads/fc246c1a9723443efad7354352fb2b75/image.png"
 legacy: true
 featured: true
-order: 3
+order: 2
 ---
 
 Repositorio: https://gitlab.com/Ninquiet/ninquietuoc-2d-pec1

@@ -10,6 +10,8 @@ links:
   - label: "Play in browser"
     url: "https://simmer.io/@Ninquiet/inquilinomalditodemotecnica"
 legacy: true
+featured: true
+order: 3
 ---
 
 ![Game test: Inquilino Maldito](./ext-d903411e1f.png)
