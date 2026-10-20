@@ -5,6 +5,7 @@ category: vfx
 tags: ["unity", "vr", "stereo rendering", "cameras"]
 summary: "A VR mirror that renders the correct perspective for each eye."
 cover: "./image-2024-11-21-015657597.png"
+video: "/media/mirror-vr.webp"
 featured: true
 legacy: true
 ---

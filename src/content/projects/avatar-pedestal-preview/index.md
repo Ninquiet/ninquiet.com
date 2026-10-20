@@ -5,6 +5,7 @@ category: xr
 tags: ["unity", "avatars", "colliders"]
 summary: "A pedestal to preview and spawn avatars, calculating colliders in real time."
 cover: "./image-2024-11-21-012928570.png"
+video: "/media/avatar-pedestal-preview.webp"
 legacy: true
 ---
 

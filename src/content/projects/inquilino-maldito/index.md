@@ -5,6 +5,7 @@ category: games
 tags: ["unity", "c#", "state machine", "ai", "webgl"]
 summary: "Zombie escape game with a reusable generic state machine driving enemy movement."
 cover: "./image-2024-11-05-164054798.png"
+video: "/media/inquilino-maldito.webp"
 links:
   - label: "Play in browser"
     url: "https://simmer.io/@Ninquiet/inquilinomalditodemotecnica"

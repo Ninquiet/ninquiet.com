@@ -5,6 +5,7 @@ category: games
 tags: ["unity", "c#", "racing", "ghost replay", "webgl"]
 summary: "Racing game where you compete against your own ghost. Every asset made by me."
 cover: "./68747470733a2f2f692e6962622e636f2f354d516348644e2f696d616765.png"
+video: "/media/race-against-the-time.webp"
 links:
   - label: "Play in browser"
     url: "https://simmer.io/@Ninquiet/carrera-contra-reloj-v1-pec1"

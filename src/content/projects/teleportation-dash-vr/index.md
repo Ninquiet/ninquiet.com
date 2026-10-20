@@ -5,6 +5,7 @@ category: xr
 tags: ["unity", "vr", "locomotion"]
 summary: "A dash to your destination instead of the typical VR teleport."
 cover: "./image-2024-11-21-015034149.png"
+video: "/media/teleportation-dash-vr.webp"
 featured: true
 legacy: true
 ---

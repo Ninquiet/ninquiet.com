@@ -5,6 +5,7 @@ category: vfx
 tags: ["hlsl", "vfx graph", "vertex displacement"]
 summary: "Rocket flame for the Somnium Space hover bikes, with custom HLSL shaders, heat distortion, and dust."
 cover: "./screenshot-2024-11-20-131521.png"
+video: "/media/hover-bikes-fire.webp"
 links:
   - label: "Post on X"
     url: "https://twitter.com/i/status/1854975117270438149"

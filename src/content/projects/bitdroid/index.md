@@ -5,6 +5,7 @@ category: games
 tags: ["unity", "c#", "platformer", "webgl", "android"]
 summary: "Action platformer with shooting, helmets as extra lives, and traps. Playable in the browser and on Android."
 cover: "./image-2024-11-05-164439597.png"
+video: "/media/bitdroid.webp"
 links:
   - label: "Play in browser"
     url: "https://simmer.io/@Ninquiet/bitdroid"

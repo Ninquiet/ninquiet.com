@@ -5,6 +5,7 @@ category: vfx
 tags: ["unity", "render textures", "shaders", "vr"]
 summary: "A portal system that connects a whole metaverse, built on a multi-camera rendering setup."
 cover: "./image-2024-11-21-012132353.png"
+video: "/media/portals.webp"
 featured: true
 legacy: true
 ---

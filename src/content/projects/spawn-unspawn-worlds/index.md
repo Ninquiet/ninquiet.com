@@ -5,6 +5,7 @@ category: vfx
 tags: ["shaders", "vfx graph", "dotween", "urp", "single pass"]
 summary: "Appear and disappear effect for world spheres, made for VR on URP single pass."
 cover: "./image-2024-11-21-010417549.png"
+video: "/media/spawn-unspawn-worlds.webp"
 legacy: true
 ---
 

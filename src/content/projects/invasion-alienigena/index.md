@@ -5,6 +5,7 @@ category: games
 tags: ["unity", "c#", "platformer", "webgl", "android"]
 summary: "Platformer where you fight an alien invasion, built as UOC master coursework."
 cover: "./image-2024-11-05-164255163.png"
+video: "/media/invasion-alienigena.webp"
 links:
   - label: "Play in browser"
     url: "https://simmer.io/@Ninquiet/invasionalienigena"

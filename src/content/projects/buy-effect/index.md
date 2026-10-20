@@ -5,6 +5,7 @@ category: vfx
 tags: ["shaders", "vfx graph", "user generated content"]
 summary: "A purchase effect that adapts to any community-uploaded object or avatar, whatever its materials."
 cover: "./image-2024-11-21-011018703.png"
+video: "/media/buy-effect.webp"
 featured: true
 legacy: true
 ---

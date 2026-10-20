@@ -10,6 +10,18 @@ interface Elements {
   bar: HTMLElement;
 }
 
+interface StageText {
+  leaving: string;
+  arriving: string;
+  label: string;
+}
+
+function stageFor(url: URL, fallback: string): StageText {
+  if (url.pathname === '/') return { leaving: 'BACK TO BASE', arriving: 'WELCOME BACK', label: 'ninquiet.com' };
+  if (url.pathname === '/projects/') return { leaving: 'LOADING STAGE SELECT', arriving: 'STAGE SELECT', label: '~/projects' };
+  return { leaving: 'LOADING STAGE', arriving: 'STAGE START', label: fallback };
+}
+
 interface Cell {
   x: number;
   y: number;
@@ -41,15 +53,16 @@ export class LevelTransition {
     const link = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
     if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
     const url = new URL(link.href, window.location.href);
-    if (url.origin !== window.location.origin || !url.pathname.startsWith('/projects/')) return;
+    if (url.origin !== window.location.origin || !url.pathname.endsWith('/')) return;
     if (url.pathname === window.location.pathname) return;
     event.preventDefault();
     const name = link.querySelector('.name')?.textContent?.trim() || link.textContent?.trim() || url.pathname;
-    void this.leave(url.href, name);
+    void this.leave(url, stageFor(url, name));
   };
 
   private onNavigate = (event: CustomEvent<{ href: string; label?: string }>): void => {
-    void this.leave(event.detail.href, event.detail.label ?? event.detail.href);
+    const url = new URL(event.detail.href, window.location.href);
+    void this.leave(url, stageFor(url, event.detail.label ?? url.pathname));
   };
 
   private cells(order: 'in' | 'out'): Cell[] {
@@ -108,34 +121,35 @@ export class LevelTransition {
     this.el.title.textContent = title;
   }
 
-  private async leave(href: string, label: string): Promise<void> {
+  private async leave(url: URL, stage: StageText): Promise<void> {
     if (this.busy) return;
     this.busy = true;
     const { root, bar } = this.el;
     root.dataset.state = 'covering';
     bar.style.setProperty('--progress', '0');
     await this.animate(true, 420);
-    this.setText('LOADING STAGE', label);
+    this.setText(stage.leaving, stage.label);
     root.dataset.state = 'loading';
     for (let i = 1; i <= 8; i++) {
       bar.style.setProperty('--progress', String(i / 8));
       await wait(34);
     }
     try {
-      sessionStorage.setItem(STORAGE_KEY, label);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ kicker: stage.arriving, label: stage.label }));
     } catch {}
-    window.location.href = href;
+    window.location.href = url.href;
   }
 
   private async enter(): Promise<void> {
-    let label: string | null = null;
+    let stored: { kicker: string; label: string } | null = null;
     try {
-      label = sessionStorage.getItem(STORAGE_KEY);
+      const raw = sessionStorage.getItem(STORAGE_KEY);
       sessionStorage.removeItem(STORAGE_KEY);
+      if (raw) stored = raw.startsWith('{') ? JSON.parse(raw) : { kicker: 'STAGE START', label: raw };
     } catch {}
-    if (!label) return this.reset();
+    if (!stored) return this.reset();
     const { root } = this.el;
-    this.setText('STAGE START', label);
+    this.setText(stored.kicker, stored.label);
     root.dataset.state = 'loading';
     this.el.bar.style.setProperty('--progress', '1');
     await wait(260);

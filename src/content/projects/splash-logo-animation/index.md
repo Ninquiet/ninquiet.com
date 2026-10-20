@@ -5,6 +5,7 @@ category: vfx
 tags: ["shaders", "vfx graph", "timeline", "dotween"]
 summary: "Intro splash screen animation with custom shaders, VFX Graph, and Timeline."
 cover: "./image-2024-11-21-014322066.png"
+video: "/media/splash-logo-animation.webp"
 legacy: true
 ---
 

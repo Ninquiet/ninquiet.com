@@ -5,6 +5,7 @@ category: games
 tags: ["unity", "c#", "3d platformer", "webgl"]
 summary: "3D platformer built as UOC master coursework."
 cover: "./image-2024-04-28-181111738.png"
+video: "/media/solo-en-la-sola-soledad.webp"
 links:
   - label: "Play in browser"
     url: "https://simmer.io/@Ninquiet/solo-en-la-sola-soledad-beta"

@@ -5,6 +5,7 @@ category: games
 tags: ["unity", "c#", "2d", "dialogue system", "webgl"]
 summary: "Insult sword-fighting adventure inspired by Monkey Island, with a modular code core."
 cover: "./image-2024-03-31-153453516.png"
+video: "/media/escuela-de-insultos.webp"
 links:
   - label: "Play in browser"
     url: "https://simmer.io/@Ninquiet/escapa-de-la-escuela-de-insultos"

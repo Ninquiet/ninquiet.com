@@ -5,6 +5,7 @@ category: vfx
 tags: ["shaders", "ui", "real-time"]
 summary: "A dissolve system that adapts in real time to meshes and UI alike."
 cover: "./screenshot-2024-11-21-020206.png"
+video: "/media/tech-dissolve.webp"
 legacy: true
 ---
 

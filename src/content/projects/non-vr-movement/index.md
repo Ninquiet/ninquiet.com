@@ -5,6 +5,7 @@ category: xr
 tags: ["unity", "animation", "mocap", "character controller"]
 summary: "First and third person movement for people without a headset, with animations I recorded myself."
 cover: "./image-2024-11-21-014713166.png"
+video: "/media/non-vr-movement.webp"
 legacy: true
 ---
 

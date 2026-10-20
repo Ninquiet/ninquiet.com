@@ -5,6 +5,7 @@ category: vfx
 tags: ["shader graph", "single shader"]
 summary: "A Matrix-style code rain built in a single shader, step by step."
 cover: "./image-2025-10-07-142444347.png"
+video: "/media/matrix-code-rain.webp"
 featured: true
 legacy: true
 ---

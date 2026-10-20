@@ -5,6 +5,7 @@ category: xr
 tags: ["unity", "vr", "physics"]
 summary: "Force zones that pull the player and carry them through the air, combinable into new experiences."
 cover: "./image-2024-11-21-013338716.png"
+video: "/media/force-zones-vr.webp"
 legacy: true
 ---
 
