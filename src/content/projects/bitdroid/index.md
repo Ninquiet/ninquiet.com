@@ -11,8 +11,9 @@ links:
     url: "https://simmer.io/@Ninquiet/bitdroid"
   - label: "Android APK"
     url: "https://drive.google.com/file/d/1uboAKwvmPvxGybUzf7whBWIWJWcflw6M/view?usp=sharing"
-featured: true
 legacy: true
+featured: true
+order: 1
 ---
 
 ## BITDROID

@@ -17,6 +17,7 @@ const projects = defineCollection({
       version: z.string().optional(),
       license: z.string().optional(),
       featured: z.boolean().default(false),
+      order: z.number().optional(),
       legacy: z.boolean().default(false),
       links: z.array(z.object({ label: z.string(), url: z.string() })).default([]),
     }),

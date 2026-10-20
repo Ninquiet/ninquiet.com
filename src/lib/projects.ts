@@ -11,7 +11,9 @@ export async function getProjects(): Promise<Project[]> {
 
 export function pickForSection(projects: Project[], categories: string[], limit: number): { shown: Project[]; rest: number } {
   const matching = projects.filter((project) => categories.includes(project.data.category));
-  const ordered = [...matching.filter((p) => p.data.featured), ...matching.filter((p) => !p.data.featured)];
+  const byOrder = (a: Project, b: Project) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity);
+  const featured = matching.filter((p) => p.data.featured).sort(byOrder);
+  const ordered = [...featured, ...matching.filter((p) => !p.data.featured)];
   return { shown: ordered.slice(0, limit), rest: Math.max(0, matching.length - limit) };
 }
 

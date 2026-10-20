@@ -9,7 +9,6 @@ video: "/media/inquilino-maldito.webp"
 links:
   - label: "Play in browser"
     url: "https://simmer.io/@Ninquiet/inquilinomalditodemotecnica"
-featured: true
 legacy: true
 ---
 
