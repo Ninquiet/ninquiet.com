@@ -6,8 +6,9 @@ tags: ["shaders", "vfx graph", "user generated content"]
 summary: "A purchase effect that adapts to any community-uploaded object or avatar, whatever its materials."
 cover: "./image-2024-11-21-011018703.png"
 video: "/media/buy-effect.webp"
-featured: true
 legacy: true
+featured: true
+order: 3
 ---
 
 This effect was created to be able to duplicate an already existing object and perform the effect without destroying the original one, the challenge on this effect is that this is created for a wide range of objects, and adapts to each one of them, is like this because the community could upload any avatar or object and even using their own custom shaders and materials, so I had so be able to create the effect with a procedural structure that adapts itself to each one of them.

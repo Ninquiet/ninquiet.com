@@ -7,6 +7,8 @@ summary: "Intro splash screen animation with custom shaders, VFX Graph, and Time
 cover: "./image-2024-11-21-014322066.png"
 video: "/media/splash-logo-animation.webp"
 legacy: true
+featured: true
+order: 5
 ---
 
 Is the intro animation (the splash screen), it use custom shadders, vfx Graph, Timeline, DoTween and so much love.

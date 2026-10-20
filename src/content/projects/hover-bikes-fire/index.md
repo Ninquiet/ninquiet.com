@@ -9,8 +9,9 @@ video: "/media/hover-bikes-fire.webp"
 links:
   - label: "Post on X"
     url: "https://twitter.com/i/status/1854975117270438149"
-featured: true
 legacy: true
+featured: true
+order: 4
 ---
 
 I've re-created an old effect of Rocket flame on Somnium Space Hover bikes
