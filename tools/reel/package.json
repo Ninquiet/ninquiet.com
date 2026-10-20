@@ -1,0 +1,17 @@
+{
+  "name": "ninquiet-reel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "media": "node scripts/fetch-media.mjs",
+    "record-site": "node scripts/record-site.mjs",
+    "stills": "node scripts/render.mjs stills",
+    "probe": "node scripts/render.mjs probe",
+    "render": "node scripts/render.mjs full",
+    "data": "node scripts/export-data.mjs"
+  },
+  "dependencies": {
+    "mp4-muxer": "5.2.2",
+    "puppeteer-core": "^24.43.1"
+  }
+}
