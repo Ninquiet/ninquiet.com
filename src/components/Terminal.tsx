@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { LEVEL_EVENT } from '../lib/levelTransition';
 import { PROFILE } from '../data/profile';
+import { REEL_EVENT } from '../data/reel';
 import { applyPalette, isPalette } from '../lib/palette';
 import { complete, execute } from '../lib/terminal/shell';
 import type { Line, ProjectEntry, Segment, TerminalContext } from '../lib/terminal/types';
@@ -40,6 +41,7 @@ export default function Terminal({ projects, intro = 'whoami' }: Props) {
       projects,
       navigate: (href, label) =>
         window.setTimeout(() => window.dispatchEvent(new CustomEvent(LEVEL_EVENT, { detail: { href, label: label ?? href } })), 300),
+      openReel: () => window.setTimeout(() => window.dispatchEvent(new CustomEvent(REEL_EVENT)), 600),
       setPalette: (name) => {
         if (!isPalette(name)) return false;
         applyPalette(name);

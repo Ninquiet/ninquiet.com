@@ -6,6 +6,7 @@ import ScrollGlitch from '../components/ScrollGlitch.astro';
 import HoverBackdrop from '../components/HoverBackdrop.astro';
 import CardEffects from '../components/CardEffects.astro';
 import PageTransition from '../components/PageTransition.astro';
+import ReelOverlay from '../components/ReelOverlay.astro';
 
 interface Props {
   title?: string;
@@ -78,6 +79,7 @@ const cvLink = { href: PROFILE.cv, label: '~/cv.pdf', download: PROFILE.cvFileNa
     </footer>
     <HoverBackdrop />
     <CardEffects />
+    <ReelOverlay />
     <ScrollGlitch />
     <PageTransition />
     <script>

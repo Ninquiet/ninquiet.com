@@ -6,6 +6,7 @@ import ProjectCard from '../components/ProjectCard.astro';
 import GitLog from '../components/GitLog.astro';
 import BitDroid from '../components/BitDroid.tsx';
 import { PROFILE } from '../data/profile';
+import { REEL } from '../data/reel';
 import { HOME_SECTIONS } from '../data/homeSections';
 import { getProjects, pickForSection, toTerminalEntry } from '../lib/projects';
 
@@ -29,6 +30,7 @@ const archiveCount = projects.length - shownCount;
         <div class="chips">
           <span class="tag">{PROFILE.location}</span>
           <span class="tag">@ {PROFILE.company}</span>
+          <a class="tag reel-chip" href={REEL.src} data-reel><span class="play">▶</span> reel.mp4</a>
           <a class="tag cv-chip" href={PROFILE.cv} download={PROFILE.cvFileName}>cv.pdf ↓</a>
           <a class="tag" href={PROFILE.github}>github</a>
           <a class="tag" href={PROFILE.gitlab}>gitlab</a>
@@ -118,6 +120,9 @@ const archiveCount = projects.length - shownCount;
   .cta { font-family: var(--display); font-size: clamp(32px, 5vw, 56px); letter-spacing: -0.03em; margin: 0 0 24px; }
   .mail { font-size: clamp(16px, 2.4vw, 22px); }
   .cv-chip { color: var(--acc); border-color: var(--acc); }
+  .reel-chip { color: var(--acc2); border-color: var(--acc2); }
+  .reel-chip .play { display: inline-block; animation: blink 1s steps(1) infinite; }
+  @media (prefers-reduced-motion: reduce) { .reel-chip .play { animation: none; } }
   .cv-download {
     display: inline-block;
     margin-top: 18px;

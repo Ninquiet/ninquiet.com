@@ -1,0 +1,185 @@
+---
+import { PROFILE } from '../data/profile';
+import { REEL } from '../data/reel';
+---
+
+<div class="reel" id="reel" role="dialog" aria-modal="true" aria-label="Portfolio reel" tabindex="-1" hidden>
+  <div class="cabinet">
+    <div class="top">
+      <span class="k">❯ ./reel.mp4</span>
+      <span class="credit">CREDIT 01</span>
+      <button type="button" class="key" data-reel-close>[ESC] exit</button>
+    </div>
+    <div class="screen">
+      <video data-reel-video playsinline preload="none" poster={REEL.poster}></video>
+      <div class="end" data-reel-end hidden>
+        <button type="button" class="key" data-reel-replay>[R] replay</button>
+        <a class="key hire" href={`mailto:${PROFILE.email}`}>hire me</a>
+        <a class="key" href={PROFILE.cv} download={PROFILE.cvFileName}>cv.pdf ↓</a>
+      </div>
+    </div>
+    <div class="map" data-reel-map aria-hidden="true"></div>
+    <div class="controls">
+      <button type="button" class="key open" data-reel-open>[ENTER] open <span data-reel-open-label>...</span> ↗</button>
+      <button type="button" class="key" data-reel-sound aria-pressed="true">[M] sound: on</button>
+      <button type="button" class="key" data-reel-fullscreen>[F] fullscreen</button>
+      <span class="hint d">[SPACE] pause · [← →] seek</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { ReelPlayer } from '../lib/reelPlayer';
+
+  const root = document.getElementById('reel');
+  if (root) {
+    const q = <T extends Element>(selector: string) => root.querySelector<T>(selector)!;
+    new ReelPlayer({
+      root,
+      screen: q<HTMLElement>('.screen'),
+      video: q<HTMLVideoElement>('[data-reel-video]'),
+      map: q<HTMLElement>('[data-reel-map]'),
+      open: q<HTMLButtonElement>('[data-reel-open]'),
+      openLabel: q<HTMLElement>('[data-reel-open-label]'),
+      sound: q<HTMLButtonElement>('[data-reel-sound]'),
+      fullscreen: q<HTMLButtonElement>('[data-reel-fullscreen]'),
+      close: q<HTMLButtonElement>('[data-reel-close]'),
+      end: q<HTMLElement>('[data-reel-end]'),
+      replay: q<HTMLButtonElement>('[data-reel-replay]'),
+    }).attach();
+  }
+</script>
+
+<style>
+  .reel {
+    --stage: var(--acc);
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgb(0 0 0 / 0.9);
+    backdrop-filter: blur(3px);
+    outline: none;
+  }
+  .reel[hidden] { display: none; }
+  .reel[data-stage='2'] { --stage: var(--acc2); }
+  .reel[data-stage='4'] { --stage: #ff4d6d; }
+  :global(html.reel-open) { overflow: hidden; }
+
+  .cabinet {
+    width: min(1100px, 100%, (100vh - 190px) * 16 / 9);
+    display: grid;
+    gap: 12px;
+  }
+  .reel[data-state='on'] .cabinet { animation: crt-on 0.42s steps(14) both; }
+  .reel[data-state='off'] .cabinet { animation: crt-off 0.3s steps(10) both; }
+
+  .top, .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    font-size: 13px;
+  }
+  .top { justify-content: space-between; }
+  .credit {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--acc2);
+    animation: blink 1s steps(1) infinite;
+  }
+
+  .screen {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    overflow: hidden;
+    box-shadow:
+      0 -4px 0 0 var(--stage),
+      0 4px 0 0 var(--stage),
+      -4px 0 0 0 var(--stage),
+      4px 0 0 0 var(--stage),
+      8px 8px 0 0 color-mix(in srgb, var(--acc2) 45%, transparent),
+      0 0 60px color-mix(in srgb, var(--stage) 30%, transparent);
+    transition: box-shadow 0.2s;
+  }
+  .screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.18) 2px 3px);
+    box-shadow: inset 0 0 90px rgb(0 0 0 / 0.65);
+  }
+  .screen:fullscreen { box-shadow: none; }
+  video { display: block; width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
+
+  .end {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 7%;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  .end[hidden] { display: none; }
+
+  .map {
+    display: flex;
+    gap: 2px;
+    height: 10px;
+    cursor: pointer;
+  }
+  .map :global(span) {
+    --c: var(--acc);
+    --p: 0;
+    background: linear-gradient(90deg, var(--c) calc(var(--p) * 100%), color-mix(in srgb, var(--c) 22%, transparent) 0);
+  }
+  .map :global(span[data-stage='0']),
+  .map :global(span[data-stage='5']) { --c: var(--dim); }
+  .map :global(span[data-stage='2']) { --c: var(--acc2); }
+  .map :global(span[data-stage='4']) { --c: #ff4d6d; }
+
+  .key {
+    font: inherit;
+    font-size: 13px;
+    color: var(--txt);
+    background: var(--panel);
+    border: 0;
+    padding: 6px 12px;
+    cursor: pointer;
+    box-shadow: 0 -2px 0 0 var(--line), 0 2px 0 0 var(--line), -2px 0 0 0 var(--line), 2px 0 0 0 var(--line);
+  }
+  .key:hover:not(:disabled), .key:focus-visible { color: var(--bg); background: var(--stage); text-decoration: none; }
+  .key:disabled { opacity: 0.45; cursor: default; }
+  .open { color: var(--stage); }
+  .open span { color: var(--txt); }
+  .hire { color: var(--bg); background: var(--acc); }
+  .hint { margin-left: auto; font-size: 12px; }
+
+  @media (pointer: coarse), (max-width: 640px) {
+    .hint { display: none; }
+    .key { font-size: 12px; padding: 8px 10px; }
+  }
+
+  @keyframes crt-on {
+    0% { transform: scale(0.6, 0.004); filter: brightness(4); }
+    45% { transform: scale(1, 0.004); filter: brightness(3); }
+    100% { transform: scale(1, 1); filter: none; }
+  }
+  @keyframes crt-off {
+    0% { transform: scale(1, 1); filter: none; }
+    55% { transform: scale(1, 0.004); filter: brightness(3); }
+    100% { transform: scale(0, 0.004); filter: brightness(4); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reel[data-state] .cabinet { animation: none; }
+    .credit { animation: none; }
+  }
+</style>

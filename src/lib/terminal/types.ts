@@ -16,6 +16,7 @@ export interface TerminalContext {
   projects: ProjectEntry[];
   navigate: (href: string, label?: string) => void;
   setPalette: (name: string) => boolean;
+  openReel: () => void;
 }
 
 export type CommandOutput = Line[] | 'clear';

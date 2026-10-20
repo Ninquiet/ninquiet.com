@@ -123,6 +123,16 @@ const cv: Command = {
   run: () => [['downloading ', k('cv.pdf', PROFILE.cv)], [d('click the link if it does not start on its own')]],
 };
 
+const reel: Command = {
+  name: 'reel',
+  aliases: ['play', './reel.sh', 'insert-coin'],
+  summary: 'insert coin: my 60s highlight reel',
+  run: (_args, ctx) => {
+    ctx.openReel();
+    return [[d('inserting coin ...')], [k('CREDIT 01'), d('  loading reel.mp4 '), k(bar(10))]];
+  },
+};
+
 const sudo: Command = {
   name: 'sudo',
   summary: 'try: sudo hire-me',
@@ -159,7 +169,7 @@ const rm: Command = {
   run: () => [[p('rm: permission denied. the portfolio stays.')]],
 };
 
-export const COMMANDS: Command[] = [help, whoami, ls, open, about, skills, contact, cv, sudo, theme, clear, echo, rm];
+export const COMMANDS: Command[] = [help, whoami, ls, open, about, skills, contact, cv, reel, sudo, theme, clear, echo, rm];
 
 export function resolveCommand(name: string): Command | undefined {
   return COMMANDS.find((command) => command.name === name || command.aliases?.includes(name));
