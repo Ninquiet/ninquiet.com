@@ -120,9 +120,29 @@ const archiveCount = projects.length - shownCount;
   .cta { font-family: var(--display); font-size: clamp(32px, 5vw, 56px); letter-spacing: -0.03em; margin: 0 0 24px; }
   .mail { font-size: clamp(16px, 2.4vw, 22px); }
   .cv-chip { color: var(--acc); border-color: var(--acc); }
-  .reel-chip { color: var(--acc2); border-color: var(--acc2); }
+  .reel-chip {
+    position: relative;
+    color: var(--acc2);
+    border-color: var(--acc2);
+    background: color-mix(in srgb, var(--acc2) 10%, transparent);
+    animation: reel-glow 1.2s steps(2) infinite;
+  }
+  .reel-chip.is-dancing { animation: reel-glow 1.2s steps(2) infinite, reel-dance 0.9s steps(12); }
+  a.reel-chip:hover { color: var(--bg); background: var(--acc2); border-color: var(--acc2); }
   .reel-chip .play { display: inline-block; animation: blink 1s steps(1) infinite; }
-  @media (prefers-reduced-motion: reduce) { .reel-chip .play { animation: none; } }
+  @keyframes reel-glow {
+    0% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 0 14px 1px color-mix(in srgb, var(--acc2) 70%, transparent); }
+  }
+  @keyframes reel-dance {
+    0% { transform: none; }
+    15% { transform: translateY(-6px) rotate(-8deg); }
+    30% { transform: scale(1.1, 0.9); }
+    45% { transform: translateY(-5px) rotate(8deg); }
+    60% { transform: scale(1.08, 0.92); }
+    75% { transform: translateY(-3px) rotate(-4deg); }
+    100% { transform: none; }
+  }
   .cv-download {
     display: inline-block;
     margin-top: 18px;
@@ -137,3 +157,10 @@ const archiveCount = projects.length - shownCount;
     .hero-grid { grid-template-columns: minmax(0, 1fr); }
   }
 </style>
+
+<script>
+  import { ReelBeacon } from '../lib/reelBeacon';
+
+  const chip = document.querySelector<HTMLElement>('.reel-chip');
+  if (chip) new ReelBeacon(chip).attach();
+</script>
