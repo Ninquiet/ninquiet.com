@@ -101,12 +101,13 @@ const poster = video && cover ? (await getImage({ src: cover, width: 1120, forma
   .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .links { margin-top: 16px; gap: 16px; font-size: 14px; }
   .cover { margin: 40px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .cover video { display: block; width: 100%; height: auto; background: #000; }
+  .cover img, .cover video { display: block; width: 100%; height: auto; background: #000; }
   .prose { max-width: 760px; font-size: 15px; }
   .prose :global(h2) { font-family: var(--display); font-size: 26px; margin: 40px 0 12px; }
   .prose :global(h2)::before { content: '## '; color: var(--acc); font-family: var(--mono); font-size: 18px; }
   .prose :global(p) { margin: 0 0 18px; }
   .prose :global(img) { width: 100%; border: 1px solid var(--line); border-radius: 8px; margin: 8px 0; }
+  .prose :global(video) { display: block; width: 100%; height: auto; background: #000; border: 1px solid var(--line); border-radius: 8px; margin: 24px 0; }
   .prose :global(li::marker) { color: var(--acc); }
   .prose :global(strong) { color: var(--acc); font-weight: 500; }
   .prose :global(.embed) { position: relative; aspect-ratio: 16 / 9; margin: 24px 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
