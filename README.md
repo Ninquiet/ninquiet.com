@@ -59,3 +59,8 @@ Add a `Command` object to `src/lib/terminal/commands.ts` and append it to `COMMA
    - `A` records for `@`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
    - `CNAME` for `www`: `ninquiet.github.io`
 4. Back in Pages settings, enable **Enforce HTTPS** once the certificate is issued.
+
+## License
+
+- **Source code:** [PolyForm Noncommercial 1.0.0](LICENSE.md#2-source-code-polyform-noncommercial-license-100). Read it, learn from it, use it for noncommercial purposes.
+- **Content and visual identity** (projects, images, videos, personal data, characters and pixel art, the "ninquiet" name and look): **all rights reserved**. See [LICENSE.md](LICENSE.md#1-content-and-visual-identity-all-rights-reserved).
